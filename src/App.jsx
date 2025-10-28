@@ -321,6 +321,19 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
   );
 }
 
+function Building({ position, scale = 1 }) {building
+  return (
+    <group position={position}>
+      <mesh position={[0, 0.9, 0]}>
+        <boxGeometry args={[1.5, 1.6, 1.2]} />
+        <meshStandardMaterial color="#BDA27D" roughness={0.8} />
+      </mesh>
+    </group>
+  );
+}
+
+
+
 // Decorative Tree (non-interactive background element)
 function DecorativeTree({ position, scale = 1, treeType = 'pine' }) {
   if (treeType === 'pine') {
@@ -367,6 +380,8 @@ function DecorativeTree({ position, scale = 1, treeType = 'pine' }) {
     );
   }
 }
+
+
 
 // Bush/Shrub Component
 function Bush({ position, scale = 1 }) {
@@ -824,8 +839,8 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
       {/* Grid lines for structure */}
       <gridHelper args={[40, 40, '#4a7c3c', '#4a7c3c']} position={[0, 0.01, 0]} />
 
-      {/* Fog for depth perception */}
-      <fog attach="fog" args={['#87ceeb', 10, 50]} />
+      {/* Fog for depth perception
+      <fog attach="fog" args={['#87ceeb', 10, 50]} /> */}
 
       {/* Central pathway */}
       <GardenPath position={[0, 0.02, 0]} width={2.5} length={18} />
@@ -850,8 +865,8 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
             balance={accountBalances[account.name] || 0}
           />
         ))}
-
-        {/* Decorative background trees */}
+{/* 
+        Decorative background trees */}
         <DecorativeTree position={[-10, 0, 4]} scale={1.3} treeType="pine" />
         <DecorativeTree position={[-10, 0, -4]} scale={1.1} treeType="round" />
         <DecorativeTree position={[-2, 0, -5]} scale={0.9} treeType="pine" />
