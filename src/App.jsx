@@ -321,16 +321,7 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
   );
 }
 
-function Building({ position, scale = 1 }) {building
-  return (
-    <group position={position}>
-      <mesh position={[0, 0.9, 0]}>
-        <boxGeometry args={[1.5, 1.6, 1.2]} />
-        <meshStandardMaterial color="#BDA27D" roughness={0.8} />
-      </mesh>
-    </group>
-  );
-}
+
 
 
 
