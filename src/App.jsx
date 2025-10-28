@@ -394,40 +394,7 @@ function Bush({ position, scale = 1 }) {
   );
 }
 
-// Pergola/Gazebo Structure
-function Pergola({ position, size = 3 }) {
-  return (
-    <group position={position}>
-      {/* Four corner posts */}
-      {[[-1, 0, -1], [1, 0, -1], [-1, 0, 1], [1, 0, 1]].map((pos, i) => (
-        <mesh key={i} position={[pos[0] * size/2, 1.2, pos[2] * size/2]}>
-          <cylinderGeometry args={[0.08, 0.1, 2.4, 8]} />
-          <meshStandardMaterial color="#f5f5f5" roughness={0.4} />
-        </mesh>
-      ))}
-      {/* Top beams */}
-      <mesh position={[0, 2.4, 0]}>
-        <boxGeometry args={[size + 0.2, 0.12, 0.12]} />
-        <meshStandardMaterial color="#f5f5f5" roughness={0.4} />
-      </mesh>
-      <mesh position={[0, 2.4, size/3]} rotation={[0, Math.PI/2, 0]}>
-        <boxGeometry args={[size + 0.2, 0.12, 0.12]} />
-        <meshStandardMaterial color="#f5f5f5" roughness={0.4} />
-      </mesh>
-      <mesh position={[0, 2.4, -size/3]} rotation={[0, Math.PI/2, 0]}>
-        <boxGeometry args={[size + 0.2, 0.12, 0.12]} />
-        <meshStandardMaterial color="#f5f5f5" roughness={0.4} />
-      </mesh>
-      {/* Cross beams */}
-      {[-0.5, 0, 0.5].map((z, i) => (
-        <mesh key={i} position={[0, 2.3, z * size]} rotation={[0, 0, 0]}>
-          <boxGeometry args={[size * 0.8, 0.08, 0.08]} />
-          <meshStandardMaterial color="#f5f5f5" roughness={0.4} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
+
 
 // Fountain Component
 function Fountain({ position }) {
@@ -927,7 +894,7 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
         <Railing position={[6, 0, -6]} width={10} orientation="horizontal" />
         
         {/* Advanced Decorative Elements */}
-         <Pergola position={[12, 0, 0]} size={2.5} />
+
          <Bench position={[9, 0, 3]} rotation={Math.PI/4} />
          <LampPost position={[7, 0, -5]} />
          <Topiary position={[5, 0, 1]} shape="cone" />
@@ -940,9 +907,7 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
         {/* Central fountain */}
         <Fountain position={[0, 0, 0]} />
         
-        {/* Pergolas */}
-        <Pergola position={[-6, 0, 0]} size={4} />
-        <Pergola position={[6, 0, 0]} size={4} />
+
         
         {/* Benches */}
         <Bench position={[-3, 0, 6]} rotation={Math.PI} />
