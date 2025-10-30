@@ -1,27 +1,27 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Text, Stars, Sky, Environment, Sparkles, Cloud } from '@react-three/drei';
+import { OrbitControls, Text, Stars, Sky, Environment, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 
-// LIABILITIES - Right Side (using trees as containers)
+// LIABILITIES - Right Side (using different objects as containers)
 const liabilityAccounts = [
-  { name: 'Credit Card Debt', position: [8, 0, 2], scale: 1.2 },
-  { name: 'Bank Loan', position: [8, 0, -2], scale: 1.5 },
-  { name: 'Accounts Payable', position: [4, 0, -2], scale: 1.0 },
-  { name: 'Mortgage', position: [4, 0, 2], scale: 1.8 },
-  { name: 'Tax Payable', position: [6, 0, 0], scale: 1.3 },
-  { name: 'Accrued Expenses', position: [6, 0, -4], scale: 0.9 },
-  { name: 'Short-term Debt', position: [4, 0, 0], scale: 1.1 },
+  { name: 'Credit Card Debt', position: [8, 0, 2], scale: 1.2, type: 'creditcard' },
+  { name: 'Bank Loan', position: [8, 0, -2], scale: 1.5, type: 'document' },
+  { name: 'Accounts Payable', position: [4, 0, -2], scale: 1.0, type: 'invoice' },
+  { name: 'Mortgage', position: [4, 0, 2], scale: 1.8, type: 'house' },
+  { name: 'Tax Payable', position: [6, 0, 0], scale: 1.3, type: 'tax' },
+  { name: 'Accrued Expenses', position: [6, 0, -4], scale: 1.5, type: 'accrued' },
+  { name: 'Short-term Debt', position: [4, 0, 0], scale: 1.6, type: 'iou' },
 ];
 
-// ASSETS - Left Side (using trees as containers)
+// ASSETS - Left Side (using different objects)
 const assetAccounts = [
-  { name: 'Cash Account', position: [-4, 0, 4], scale: 1.4 },
-  { name: 'Savings Account', position: [-8, 0, 2], scale: 1.6 },
-  { name: 'Inventory', position: [-8, 0, -2], scale: 1.2 },
-  { name: 'Equipment', position: [-6, 0, 0], scale: 1.5 },
-  { name: 'Real Estate', position: [-4, 0, 2], scale: 1.8 },
-  { name: 'Investments', position: [-4, 0, -2], scale: 1.3 },
+  { name: 'Cash Account', position: [-4, 0, 4], scale: 1.4, type: 'safe', rotation: -Math.PI / 2 },
+  { name: 'HSBC Bank', position: [-8, 0, 2], scale: 1.6, type: 'bank' },
+  { name: 'Inventory', position: [-8, 0, -2], scale: 1.2, type: 'warehouse' },
+  { name: 'Equipment', position: [-6, 0, 0], scale: 1.5, type: 'machine' },
+  { name: 'Real Estate', position: [-4, 0, 2], scale: 1.8, type: 'office' },
+  { name: 'Investments', position: [-4, 0, -2], scale: 1.3, type: 'stock' },
 ];
 
 // Rain System Component
@@ -148,6 +148,3219 @@ function useFloatingAnimation(speed = 1, amplitude = 0.1) {
   return ref;
 }
 
+// HSBC Bank Building Component
+function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0, rotation = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1 + rotation;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+        groupRef.current.rotation.y = rotation;
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = rotation;
+      }
+    }
+  });
+
+  const selectedColor = isSelected ? (clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b') : '#e60000';
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      rotation={[0, rotation, 0]}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+      {/* Base platform */}
+      <mesh position={[0, 0.05, 0]}>
+        <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+        <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+      </mesh>
+
+      {/* Building foundation */}
+      <mesh position={[0, 0.2, 0]} castShadow>
+        <boxGeometry args={[0.7, 0.3, 0.6]} />
+        <meshStandardMaterial color="#4a4a4a" roughness={0.4} metalness={0.6} />
+      </mesh>
+
+      {/* Main building body - taller and wider */}
+      <mesh position={[0, 1.0, 0]} castShadow>
+        <boxGeometry args={[0.65, 1.8, 0.6]} />
+        <meshStandardMaterial color={hovered ? '#c41e3a' : '#e60000'} roughness={0.3} metalness={0.4} />
+      </mesh>
+
+      {/* HSBC logo red and white stripes - improved pattern */}
+      <mesh position={[0, 1.8, 0.31]}>
+        <boxGeometry args={[0.55, 0.35, 0.02]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.1} metalness={0.9} emissive="#ffffff" emissiveIntensity={isSelected ? 0.3 : 0.1} />
+      </mesh>
+      <mesh position={[0, 1.2, 0.31]}>
+        <boxGeometry args={[0.55, 0.35, 0.02]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.1} metalness={0.9} emissive="#ffffff" emissiveIntensity={isSelected ? 0.3 : 0.1} />
+      </mesh>
+
+      {/* HSBC letters on logo */}
+      <mesh position={[0, 1.5, 0.32]}>
+        <boxGeometry args={[0.4, 0.08, 0.003]} />
+        <meshStandardMaterial color="#e60000" roughness={0.8} />
+      </mesh>
+
+      {/* Window grid pattern - modern glass effect */}
+      {Array.from({ length: 5 }).map((_, floor) => (
+        <group key={`floor-${floor}`}>
+          {Array.from({ length: 3}).map((_, col) => (
+            <mesh key={`window-${floor}-${col}`} position={[-0.15 + col * 0.15, 0.4 + floor * 0.35, 0.305]} castShadow>
+              <boxGeometry args={[0.12, 0.25, 0.01]} />
+              <meshStandardMaterial 
+                color="#87ceeb" 
+                roughness={0.05} 
+                metalness={0.9} 
+                emissive="#b0d4f1" 
+                emissiveIntensity={isSelected ? 0.6 : 0.2}
+              />
+            </mesh>
+          ))}
+        </group>
+      ))}
+
+      {/* Glass entrance doors */}
+      <mesh position={[0, 0.5, 0.305]} castShadow>
+        <boxGeometry args={[0.2, 0.5, 0.015]} />
+        <meshStandardMaterial color="#87ceeb" transparent opacity={0.3} roughness={0.05} metalness={0.9} />
+      </mesh>
+
+      {/* Entrance canopy */}
+      <mesh position={[0, 0.75, 0.35]} castShadow>
+        <boxGeometry args={[0.4, 0.08, 0.15]} />
+        <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.7} />
+      </mesh>
+
+      {/* Rooftop elements */}
+      <mesh position={[0, 2.05, 0]} castShadow>
+        <boxGeometry args={[0.7, 0.08, 0.65]} />
+        <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.7} />
+      </mesh>
+
+      {/* Building lights at corners */}
+      {[
+        [-0.32, 2.0, 0.3],
+        [0.32, 2.0, 0.3],
+        [-0.32, 2.0, -0.3],
+        [0.32, 2.0, -0.3]
+      ].map((pos, i) => (
+        <mesh key={i} position={pos}>
+          <sphereGeometry args={[0.03, 16, 16]} />
+          <meshStandardMaterial color="#ffd700" emissive="#ffd700" emissiveIntensity={isSelected ? 1 : 0.5} />
+          {isSelected && <pointLight intensity={0.3} distance={2} color="#ffd700" />}
+        </mesh>
+      ))}
+
+      {/* Corner pillars for architectural detail */}
+      {[-0.325, 0.325].map((x, i) => (
+        <mesh key={i} position={[x, 1.0, 0.305]} castShadow>
+          <boxGeometry args={[0.05, 1.8, 0.02]} />
+          <meshStandardMaterial color="#8b0000" roughness={0.3} metalness={0.5} />
+        </mesh>
+      ))}
+
+      {/* Sides windows */}
+      {Array.from({ length: 5 }).map((_, floor) => (
+        Array.from({ length: 2}).map((_, col) => (
+          <mesh key={`side-${floor}-${col}`} position={[0.33, 0.4 + floor * 0.35, -0.2 + col * 0.4]} rotation={[0, Math.PI / 2, 0]} castShadow>
+            <boxGeometry args={[0.12, 0.25, 0.01]} />
+            <meshStandardMaterial 
+              color="#87ceeb" 
+              roughness={0.05} 
+              metalness={0.9} 
+              emissive="#b0d4f1" 
+              emissiveIntensity={isSelected ? 0.6 : 0.2}
+            />
+          </mesh>
+        ))
+      ))}
+
+      {/* Security cameras */}
+      {[-0.25, 0.25].map((x, i) => (
+        <mesh key={i} position={[x, 1.9, 0.28]}>
+          <sphereGeometry args={[0.04, 16, 16]} />
+          <meshStandardMaterial color="#1a1a1a" roughness={0.2} metalness={0.9} />
+        </mesh>
+      ))}
+
+      {/* Selection indicator */}
+      {isSelected && (
+        <>
+          <mesh position={[0, 0.02, 0]}>
+            <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+            <meshStandardMaterial 
+              color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              emissiveIntensity={0.8}
+            />
+          </mesh>
+          <mesh position={[0, 0.05, 0]}>
+            <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+            <meshStandardMaterial 
+              color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              emissiveIntensity={0.3}
+              transparent
+              opacity={0.6}
+            />
+          </mesh>
+        </>
+      )}
+
+      <RippleEffect 
+        position={[0, 0.01, 0]} 
+        visible={isSelected && clickCount > 0}
+        color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+      />
+
+      <Text position={[0, 2.4, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+        {name}
+      </Text>
+
+      {isSelected && (
+        <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+          {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+        </Text>
+      )}
+
+      <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+        ${balance.toFixed(2)}
+      </Text>
+      </group>
+    </group>
+  );
+}
+
+// Lorry/Truck Component
+function LorryAccount({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+  });
+
+  const selectedColor = isSelected ? (clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b') : '#ff6600';
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+      {/* Base platform */}
+      <mesh position={[0, 0.05, 0]}>
+        <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+        <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+      </mesh>
+
+      {/* Lorry cab */}
+      <mesh position={[-0.15, 0.5, 0]}>
+        <boxGeometry args={[0.2, 0.3, 0.3]} />
+        <meshStandardMaterial color={hovered ? '#ff8533' : '#ff6600'} roughness={0.5} />
+      </mesh>
+
+      {/* Lorry cargo area */}
+      <mesh position={[0.15, 0.55, 0]}>
+        <boxGeometry args={[0.35, 0.4, 0.35]} />
+        <meshStandardMaterial color={hovered ? '#e6e6fa' : '#d3d3d3'} roughness={0.6} />
+      </mesh>
+
+      {/* Wheels */}
+      {[[-0.05, -0.05], [0.35, -0.05]].map((pos, i) => (
+        <mesh key={i} position={[pos[0], 0.15, pos[1]]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.08, 0.08, 0.1, 16]} />
+          <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+        </mesh>
+      ))}
+
+      {/* Selection indicator */}
+      {isSelected && (
+        <>
+          <mesh position={[0, 0.02, 0]}>
+            <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+            <meshStandardMaterial 
+              color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              emissiveIntensity={0.8}
+            />
+          </mesh>
+          <mesh position={[0, 0.05, 0]}>
+            <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+            <meshStandardMaterial 
+              color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              emissiveIntensity={0.3}
+              transparent
+              opacity={0.6}
+            />
+          </mesh>
+        </>
+      )}
+
+      <RippleEffect 
+        position={[0, 0.01, 0]} 
+        visible={isSelected && clickCount > 0}
+        color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+      />
+
+      <Text position={[0, 1.2, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+        {name}
+      </Text>
+
+      {isSelected && (
+        <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+          {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+        </Text>
+      )}
+
+      <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+        ${balance.toFixed(2)}
+      </Text>
+      </group>
+    </group>
+  );
+}
+
+// Safe/Vault Component - High-end game quality
+function SafeVault({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0, rotation = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+  const doorRef = useRef();
+
+  useFrame((state) => {
+    if (floatingRef.current) {
+      if (isSelected) {
+        floatingRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        floatingRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1 + rotation;
+      } else if (hovered) {
+        floatingRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+        floatingRef.current.rotation.y = rotation;
+      } else {
+        floatingRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        floatingRef.current.rotation.y = rotation;
+      }
+    }
+    
+    // Animated door opening when selected
+    if (doorRef.current && isSelected) {
+      doorRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.3;
+    } else if (doorRef.current) {
+      doorRef.current.rotation.y = 0;
+    }
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef} rotation={[0, rotation, 0]}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Safe body */}
+        <mesh position={[0, 0.7, 0]} castShadow>
+          <boxGeometry args={[0.8, 1.4, 0.7]} />
+          <meshStandardMaterial 
+            color={hovered ? "#4a4a4a" : "#2c2c2c"}
+            roughness={0.2}
+            metalness={0.9}
+            envMapIntensity={1.5}
+          />
+        </mesh>
+
+        {/* Safe door */}
+        <group ref={doorRef} position={[0.4, 0.7, 0]}>
+          <mesh position={[0, 0, 0]} castShadow>
+            <boxGeometry args={[0.05, 1.2, 0.65]} />
+            <meshStandardMaterial 
+              color={hovered ? "#5a5a5a" : "#3c3c3c"}
+              roughness={0.15}
+              metalness={0.95}
+            />
+          </mesh>
+
+          {/* Door handle/wheel */}
+          <mesh position={[0.03, 0.1, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <torusGeometry args={[0.15, 0.03, 16, 32]} />
+            <meshStandardMaterial 
+              color="#d4af37"
+              roughness={0.1}
+              metalness={1}
+              emissive="#d4af37"
+              emissiveIntensity={0.2}
+            />
+          </mesh>
+
+          {/* Wheel spokes */}
+          {[0, Math.PI / 3, (2 * Math.PI) / 3, Math.PI, (4 * Math.PI) / 3, (5 * Math.PI) / 3].map((angle, i) => (
+            <mesh 
+              key={i}
+              position={[
+                0.03,
+                0.1 + Math.cos(angle) * 0.12,
+                Math.sin(angle) * 0.12
+              ]}
+              rotation={[0, angle, Math.PI / 2]}
+            >
+              <cylinderGeometry args={[0.02, 0.02, 0.12, 8]} />
+              <meshStandardMaterial 
+                color="#d4af37"
+                roughness={0.1}
+                metalness={1}
+              />
+            </mesh>
+          ))}
+        </group>
+
+        {/* Hinges */}
+        {[-0.4, 0.4].map((y, i) => (
+          <mesh key={i} position={[-0.4, 0.7 + y, 0.35]}>
+            <cylinderGeometry args={[0.04, 0.04, 0.1, 16]} />
+            <meshStandardMaterial 
+              color="#1a1a1a"
+              roughness={0.3}
+              metalness={0.8}
+            />
+          </mesh>
+        ))}
+
+        {/* Lock mechanism */}
+        <mesh position={[0.42, 0.9, 0]}>
+          <cylinderGeometry args={[0.08, 0.08, 0.06, 16]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.2}
+            metalness={0.9}
+          />
+        </mesh>
+
+        {/* Digital display */}
+        <mesh position={[0.42, 0.5, 0]}>
+          <boxGeometry args={[0.06, 0.15, 0.25]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            emissive={isSelected ? "#00ff00" : "#003300"}
+            emissiveIntensity={isSelected ? 0.8 : 0.2}
+          />
+        </mesh>
+
+        {/* Gold bars visible inside when selected */}
+        {isSelected && (
+          <group position={[0, 0.7, 0]}>
+            {[0, 0.15, -0.15].map((x, i) => (
+              <mesh key={i} position={[x - 0.1, -0.2, 0]}>
+                <boxGeometry args={[0.12, 0.06, 0.08]} />
+                <meshStandardMaterial 
+                  color="#ffd700"
+                  roughness={0.1}
+                  metalness={1}
+                  emissive="#ffd700"
+                  emissiveIntensity={0.3}
+                />
+              </mesh>
+            ))}
+          </group>
+        )}
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+      </group>
+
+      {/* Text labels outside rotation group - always upright */}
+      <Text position={[0, 2.2, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+        {name}
+      </Text>
+
+      {isSelected && (
+        <Text position={[0, 0.1, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+          {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+        </Text>
+      )}
+
+      <Text position={[0, -0.2, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+        ${balance.toFixed(2)}
+      </Text>
+    </group>
+  );
+}
+
+// Warehouse/Storage Container Component
+function WarehouseContainer({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+  const doorRef = useRef();
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+
+    // Sliding door animation
+    if (doorRef.current && isSelected) {
+      doorRef.current.position.x = Math.sin(state.clock.elapsedTime) * 0.3;
+    } else if (doorRef.current) {
+      doorRef.current.position.x = 0;
+    }
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Container body */}
+        <mesh position={[0, 0.6, 0]} castShadow>
+          <boxGeometry args={[0.9, 1.2, 0.6]} />
+          <meshStandardMaterial 
+            color={hovered ? "#e67300" : "#cc6600"}
+            roughness={0.6}
+            metalness={0.4}
+          />
+        </mesh>
+
+        {/* Corrugated pattern (vertical ribs) */}
+        {[-0.35, -0.25, -0.15, -0.05, 0.05, 0.15, 0.25, 0.35].map((x, i) => (
+          <mesh key={i} position={[x, 0.6, 0.305]} castShadow>
+            <boxGeometry args={[0.04, 1.2, 0.01]} />
+            <meshStandardMaterial 
+              color={hovered ? "#d66a00" : "#b35900"}
+              roughness={0.7}
+              metalness={0.3}
+            />
+          </mesh>
+        ))}
+
+        {/* Sliding door */}
+        <group ref={doorRef} position={[0, 0.6, 0.305]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.85, 1.15, 0.03]} />
+            <meshStandardMaterial 
+              color={hovered ? "#f5f5f5" : "#e0e0e0"}
+              roughness={0.5}
+              metalness={0.5}
+            />
+          </mesh>
+
+          {/* Door handle */}
+          <mesh position={[0.3, 0, 0.03]}>
+            <boxGeometry args={[0.15, 0.05, 0.05]} />
+            <meshStandardMaterial 
+              color="#1a1a1a"
+              roughness={0.3}
+              metalness={0.8}
+            />
+          </mesh>
+        </group>
+
+        {/* Corner reinforcements */}
+        {[
+          [-0.45, 0.6, 0.3], [0.45, 0.6, 0.3],
+          [-0.45, 0.6, -0.3], [0.45, 0.6, -0.3]
+        ].map((pos, i) => (
+          <mesh key={i} position={pos} castShadow>
+            <boxGeometry args={[0.06, 1.25, 0.06]} />
+            <meshStandardMaterial 
+              color="#1a1a1a"
+              roughness={0.4}
+              metalness={0.7}
+            />
+          </mesh>
+        ))}
+
+        {/* Top frame */}
+        <mesh position={[0, 1.25, 0]}>
+          <boxGeometry args={[0.95, 0.08, 0.65]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.4}
+            metalness={0.7}
+          />
+        </mesh>
+
+        {/* Bottom frame */}
+        <mesh position={[0, -0.05, 0]}>
+          <boxGeometry args={[0.95, 0.08, 0.65]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.4}
+            metalness={0.7}
+          />
+        </mesh>
+
+        {/* Shipping label */}
+        <mesh position={[0, 0.9, 0.31]}>
+          <boxGeometry args={[0.3, 0.2, 0.01]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Barcode on label */}
+        {[0, 0.04, 0.08, 0.12, 0.16].map((offset, i) => (
+          <mesh key={i} position={[-0.1 + offset, 0.9, 0.315]}>
+            <boxGeometry args={[0.02, 0.15, 0.005]} />
+            <meshStandardMaterial color="#000000" />
+          </mesh>
+        ))}
+
+        {/* Warning stripes */}
+        {[-0.3, 0.3].map((x, i) => (
+          <mesh key={i} position={[x, 0.3, 0.31]} rotation={[0, 0, Math.PI / 4]}>
+            <boxGeometry args={[0.4, 0.08, 0.01]} />
+            <meshStandardMaterial 
+              color="#ffff00"
+              emissive="#ffff00"
+              emissiveIntensity={0.2}
+            />
+          </mesh>
+        ))}
+
+        {/* Boxes visible inside when selected */}
+        {isSelected && (
+          <group position={[0, 0.4, 0]}>
+            {[
+              [-0.15, 0, 0], [0, 0, 0], [0.15, 0, 0],
+              [-0.15, 0.2, 0], [0, 0.2, 0]
+            ].map((pos, i) => (
+              <mesh key={i} position={pos}>
+                <boxGeometry args={[0.12, 0.12, 0.12]} />
+                <meshStandardMaterial 
+                  color="#8b4513"
+                  roughness={0.8}
+                />
+              </mesh>
+            ))}
+          </group>
+        )}
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 1.6, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+
+        <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+          ${balance.toFixed(2)}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
+// Industrial Machine Component
+function IndustrialMachine({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+  const gearRef1 = useRef();
+  const gearRef2 = useRef();
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+
+    // Rotating gears
+    if (gearRef1.current) {
+      gearRef1.current.rotation.z += isSelected ? 0.05 : 0.01;
+    }
+    if (gearRef2.current) {
+      gearRef2.current.rotation.z -= isSelected ? 0.05 : 0.01;
+    }
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Machine base */}
+        <mesh position={[0, 0.2, 0]} castShadow>
+          <boxGeometry args={[1.0, 0.3, 0.7]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.3}
+            metalness={0.8}
+          />
+        </mesh>
+
+        {/* Main body */}
+        <mesh position={[0, 0.7, 0]} castShadow>
+          <boxGeometry args={[0.8, 0.8, 0.6]} />
+          <meshStandardMaterial 
+            color={hovered ? "#3a7ca5" : "#2c5f8d"}
+            roughness={0.4}
+            metalness={0.7}
+          />
+        </mesh>
+
+        {/* Control panel */}
+        <mesh position={[0, 1.0, 0.31]} castShadow>
+          <boxGeometry args={[0.6, 0.4, 0.05]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.2}
+            metalness={0.9}
+          />
+        </mesh>
+
+        {/* Screen */}
+        <mesh position={[0, 1.0, 0.335]}>
+          <boxGeometry args={[0.35, 0.25, 0.01]} />
+          <meshStandardMaterial 
+            color="#001a1a"
+            emissive={isSelected ? "#00ff00" : "#003300"}
+            emissiveIntensity={isSelected ? 0.8 : 0.3}
+          />
+        </mesh>
+
+        {/* Buttons */}
+        {[-0.15, -0.05, 0.05, 0.15].map((x, i) => (
+          <mesh key={i} position={[x, 0.85, 0.335]}>
+            <cylinderGeometry args={[0.03, 0.03, 0.02, 16]} />
+            <meshStandardMaterial 
+              color={i === 0 ? "#ff0000" : i === 1 ? "#ffff00" : "#00ff00"}
+              emissive={i === 0 ? "#ff0000" : i === 1 ? "#ffff00" : "#00ff00"}
+              emissiveIntensity={0.5}
+              roughness={0.3}
+              metalness={0.7}
+            />
+          </mesh>
+        ))}
+
+        {/* Gear housing left */}
+        <mesh position={[-0.25, 0.7, 0.31]} castShadow>
+          <cylinderGeometry args={[0.18, 0.18, 0.1, 32]} />
+          <meshStandardMaterial 
+            color="#4a4a4a"
+            roughness={0.3}
+            metalness={0.8}
+            transparent
+            opacity={0.3}
+          />
+        </mesh>
+
+        {/* Visible gear left */}
+        <group ref={gearRef1} position={[-0.25, 0.7, 0.31]}>
+          <mesh>
+            <cylinderGeometry args={[0.15, 0.15, 0.08, 8]} />
+            <meshStandardMaterial 
+              color="#d4af37"
+              roughness={0.2}
+              metalness={1}
+            />
+          </mesh>
+          {/* Gear teeth */}
+          {Array.from({ length: 8 }).map((_, i) => {
+            const angle = (i / 8) * Math.PI * 2;
+            return (
+              <mesh 
+                key={i}
+                position={[Math.cos(angle) * 0.16, 0, Math.sin(angle) * 0.16]}
+                rotation={[0, angle, 0]}
+              >
+                <boxGeometry args={[0.06, 0.08, 0.04]} />
+                <meshStandardMaterial 
+                  color="#d4af37"
+                  roughness={0.2}
+                  metalness={1}
+                />
+              </mesh>
+            );
+          })}
+        </group>
+
+        {/* Gear housing right */}
+        <mesh position={[0.25, 0.7, 0.31]} castShadow>
+          <cylinderGeometry args={[0.18, 0.18, 0.1, 32]} />
+          <meshStandardMaterial 
+            color="#4a4a4a"
+            roughness={0.3}
+            metalness={0.8}
+            transparent
+            opacity={0.3}
+          />
+        </mesh>
+
+        {/* Visible gear right */}
+        <group ref={gearRef2} position={[0.25, 0.7, 0.31]}>
+          <mesh>
+            <cylinderGeometry args={[0.15, 0.15, 0.08, 8]} />
+            <meshStandardMaterial 
+              color="#d4af37"
+              roughness={0.2}
+              metalness={1}
+            />
+          </mesh>
+          {/* Gear teeth */}
+          {Array.from({ length: 8 }).map((_, i) => {
+            const angle = (i / 8) * Math.PI * 2;
+            return (
+              <mesh 
+                key={i}
+                position={[Math.cos(angle) * 0.16, 0, Math.sin(angle) * 0.16]}
+                rotation={[0, angle, 0]}
+              >
+                <boxGeometry args={[0.06, 0.08, 0.04]} />
+                <meshStandardMaterial 
+                  color="#d4af37"
+                  roughness={0.2}
+                  metalness={1}
+                />
+              </mesh>
+            );
+          })}
+        </group>
+
+        {/* Pistons */}
+        {[-0.3, 0.3].map((x, i) => (
+          <group key={i}>
+            <mesh position={[x, 0.4, -0.31]} castShadow>
+              <cylinderGeometry args={[0.06, 0.06, 0.3, 16]} />
+              <meshStandardMaterial 
+                color="#c0c0c0"
+                roughness={0.2}
+                metalness={0.9}
+              />
+            </mesh>
+          </group>
+        ))}
+
+        {/* Exhaust pipes */}
+        {[-0.35, 0.35].map((x, i) => (
+          <mesh key={i} position={[x, 1.2, -0.2]} castShadow>
+            <cylinderGeometry args={[0.04, 0.04, 0.3, 16]} />
+            <meshStandardMaterial 
+              color="#1a1a1a"
+              roughness={0.3}
+              metalness={0.8}
+            />
+          </mesh>
+        ))}
+
+        {/* Warning stripes */}
+        {[-0.35, 0.35].map((z, i) => (
+          <mesh key={i} position={[0, 0.35, z]} rotation={[0, 0, Math.PI / 4]}>
+            <boxGeometry args={[0.8, 0.08, 0.01]} />
+            <meshStandardMaterial 
+              color="#ffff00"
+              emissive="#ffff00"
+              emissiveIntensity={0.2}
+            />
+          </mesh>
+        ))}
+
+        {/* Status lights */}
+        {[-0.3, -0.1, 0.1, 0.3].map((x, i) => (
+          <mesh key={i} position={[x, 1.15, 0.31]}>
+            <sphereGeometry args={[0.025, 16, 16]} />
+            <meshStandardMaterial 
+              color={isSelected && i % 2 === 0 ? "#00ff00" : "#ff0000"}
+              emissive={isSelected && i % 2 === 0 ? "#00ff00" : "#ff0000"}
+              emissiveIntensity={isSelected ? 1 : 0.3}
+            />
+          </mesh>
+        ))}
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 1.7, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+
+        <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+          ${balance.toFixed(2)}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
+// Office Building Component
+function OfficeBuilding({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Building base/foundation */}
+        <mesh position={[0, 0.2, 0]} castShadow>
+          <boxGeometry args={[0.9, 0.3, 0.7]} />
+          <meshStandardMaterial 
+            color="#4a4a4a"
+            roughness={0.4}
+            metalness={0.6}
+          />
+        </mesh>
+
+        {/* Main building body */}
+        <mesh position={[0, 1.0, 0]} castShadow>
+          <boxGeometry args={[0.7, 1.5, 0.6]} />
+          <meshStandardMaterial 
+            color={hovered ? "#5a6f8a" : "#4a5f7a"}
+            roughness={0.3}
+            metalness={0.5}
+          />
+        </mesh>
+
+        {/* Windows grid - Front face */}
+        {Array.from({ length: 5 }).map((_, floor) => (
+          <group key={`front-${floor}`}>
+            {Array.from({ length: 3 }).map((_, col) => (
+              <mesh 
+                key={`window-f-${floor}-${col}`}
+                position={[-0.2 + col * 0.2, 0.4 + floor * 0.3, 0.305]}
+              >
+                <boxGeometry args={[0.12, 0.2, 0.01]} />
+                <meshStandardMaterial 
+                  color="#87ceeb"
+                  roughness={0.1}
+                  metalness={0.9}
+                  emissive="#b0d4f1"
+                  emissiveIntensity={isSelected ? 0.5 : 0.2}
+                />
+              </mesh>
+            ))}
+          </group>
+        ))}
+
+        {/* Windows grid - Side face */}
+        {Array.from({ length: 5 }).map((_, floor) => (
+          <group key={`side-${floor}`}>
+            {Array.from({ length: 2 }).map((_, col) => (
+              <mesh 
+                key={`window-s-${floor}-${col}`}
+                position={[0.355, 0.4 + floor * 0.3, -0.15 + col * 0.3]}
+                rotation={[0, Math.PI / 2, 0]}
+              >
+                <boxGeometry args={[0.12, 0.2, 0.01]} />
+                <meshStandardMaterial 
+                  color="#87ceeb"
+                  roughness={0.1}
+                  metalness={0.9}
+                  emissive="#b0d4f1"
+                  emissiveIntensity={isSelected ? 0.5 : 0.2}
+                />
+              </mesh>
+            ))}
+          </group>
+        ))}
+
+        {/* Roof */}
+        <mesh position={[0, 1.8, 0]} castShadow>
+          <boxGeometry args={[0.75, 0.1, 0.65]} />
+          <meshStandardMaterial 
+            color="#2a2a2a"
+            roughness={0.4}
+            metalness={0.7}
+          />
+        </mesh>
+
+        {/* Rooftop details - Helipad */}
+        <mesh position={[0, 1.86, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.2, 32]} />
+          <meshStandardMaterial 
+            color="#ffff00"
+            emissive="#ffff00"
+            emissiveIntensity={0.3}
+          />
+        </mesh>
+
+        {/* H letter on helipad */}
+        <Text position={[0, 1.87, 0]} rotation={[-Math.PI / 2, 0, 0]} fontSize={0.15} color="#000000" anchorX="center" anchorY="middle">
+          H
+        </Text>
+
+        {/* Air conditioning units */}
+        {[-0.25, 0.25].map((x, i) => (
+          <mesh key={i} position={[x, 1.9, 0.2]} castShadow>
+            <boxGeometry args={[0.15, 0.08, 0.1]} />
+            <meshStandardMaterial 
+              color="#6a6a6a"
+              roughness={0.6}
+              metalness={0.5}
+            />
+          </mesh>
+        ))}
+
+        {/* Entrance canopy */}
+        <mesh position={[0, 0.4, 0.35]} castShadow>
+          <boxGeometry args={[0.4, 0.05, 0.15]} />
+          <meshStandardMaterial 
+            color="#2a2a2a"
+            roughness={0.3}
+            metalness={0.7}
+          />
+        </mesh>
+
+        {/* Glass entrance doors */}
+        <mesh position={[0, 0.5, 0.305]}>
+          <boxGeometry args={[0.25, 0.4, 0.02]} />
+          <meshStandardMaterial 
+            color="#87ceeb"
+            transparent
+            opacity={0.4}
+            roughness={0.1}
+            metalness={0.9}
+          />
+        </mesh>
+
+        {/* Company logo/sign */}
+        <mesh position={[0, 1.6, 0.31]}>
+          <boxGeometry args={[0.5, 0.15, 0.02]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            emissive="#ffffff"
+            emissiveIntensity={0.3}
+          />
+        </mesh>
+
+        {/* Building lights at corners */}
+        {[
+          [-0.35, 1.75, 0.3], [0.35, 1.75, 0.3],
+          [-0.35, 1.75, -0.3], [0.35, 1.75, -0.3]
+        ].map((pos, i) => (
+          <mesh key={i} position={pos}>
+            <sphereGeometry args={[0.03, 16, 16]} />
+            <meshStandardMaterial 
+              color="#ffd700"
+              emissive="#ffd700"
+              emissiveIntensity={isSelected ? 1 : 0.5}
+            />
+            {isSelected && <pointLight intensity={0.3} distance={2} color="#ffd700" />}
+          </mesh>
+        ))}
+
+        {/* Balconies */}
+        {[0.7, 1.3].map((y, i) => (
+          <mesh key={i} position={[0, y, 0.32]} castShadow>
+            <boxGeometry args={[0.6, 0.02, 0.1]} />
+            <meshStandardMaterial 
+              color="#3a3a3a"
+              roughness={0.4}
+              metalness={0.7}
+            />
+          </mesh>
+        ))}
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 2.1, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+
+        <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+          ${balance.toFixed(2)}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
+// Credit Card Component
+function CreditCard({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+  const hologramRef = useRef();
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+
+    // Holographic effect
+    if (hologramRef.current && isSelected) {
+      hologramRef.current.material.opacity = 0.3 + Math.sin(state.clock.elapsedTime * 2) * 0.2;
+    }
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Card holder stand */}
+        <mesh position={[0, 0.5, 0]} castShadow>
+          <cylinderGeometry args={[0.05, 0.08, 0.8, 16]} />
+          <meshStandardMaterial 
+            color="#2a2a2a"
+            roughness={0.3}
+            metalness={0.8}
+          />
+        </mesh>
+
+        {/* Credit card body */}
+        <mesh position={[0, 0.9, 0]} rotation={[0, 0, 0]} castShadow>
+          <boxGeometry args={[0.85, 0.54, 0.03]} />
+          <meshStandardMaterial 
+            color={hovered ? "#1a4d7a" : "#0d3a5c"}
+            roughness={0.2}
+            metalness={0.8}
+            emissive="#0d3a5c"
+            emissiveIntensity={0.2}
+          />
+        </mesh>
+
+        {/* Holographic chip */}
+        <mesh position={[-0.2, 0.93, 0.02]} castShadow>
+          <boxGeometry args={[0.15, 0.12, 0.015]} />
+          <meshStandardMaterial 
+            color="#ffd700"
+            roughness={0.1}
+            metalness={1}
+            emissive="#ffd700"
+            emissiveIntensity={0.5}
+          />
+        </mesh>
+
+        {/* Chip circuit pattern */}
+        {[-0.04, -0.02, 0, 0.02, 0.04].map((offset, i) => (
+          <mesh key={i} position={[-0.2 + offset, 0.93, 0.028]}>
+            <boxGeometry args={[0.01, 0.1, 0.005]} />
+            <meshStandardMaterial 
+              color="#1a1a1a"
+              roughness={0.3}
+            />
+          </mesh>
+        ))}
+
+        {/* Card number embossed */}
+        {[0, 1, 2, 3].map((group, gi) => (
+          <group key={gi}>
+            {[0, 1, 2, 3].map((num, ni) => (
+              <mesh 
+                key={ni}
+                position={[-0.3 + gi * 0.2, 0.88, 0.02]}
+              >
+                <cylinderGeometry args={[0.015, 0.015, 0.01, 8]} />
+                <meshStandardMaterial 
+                  color="#ffffff"
+                  roughness={0.4}
+                  metalness={0.6}
+                />
+              </mesh>
+            ))}
+          </group>
+        ))}
+
+        {/* Magnetic stripe */}
+        <mesh position={[0, 0.9, -0.016]}>
+          <boxGeometry args={[0.85, 0.08, 0.001]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.7}
+            metalness={0.3}
+          />
+        </mesh>
+
+        {/* Card logo/brand area */}
+        <mesh position={[0.25, 0.95, 0.02]}>
+          <circleGeometry args={[0.08, 32]} />
+          <meshStandardMaterial 
+            color="#ff6b00"
+            emissive="#ff6b00"
+            emissiveIntensity={0.3}
+          />
+        </mesh>
+
+        <mesh position={[0.32, 0.95, 0.02]}>
+          <circleGeometry args={[0.08, 32]} />
+          <meshStandardMaterial 
+            color="#ff0000"
+            emissive="#ff0000"
+            emissiveIntensity={0.3}
+            transparent
+            opacity={0.7}
+          />
+        </mesh>
+
+        {/* Card holder name embossed */}
+        <mesh position={[-0.15, 0.83, 0.02]}>
+          <boxGeometry args={[0.3, 0.03, 0.008]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            roughness={0.5}
+          />
+        </mesh>
+
+        {/* Expiry date */}
+        <mesh position={[0.15, 0.83, 0.02]}>
+          <boxGeometry args={[0.1, 0.025, 0.008]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            roughness={0.5}
+          />
+        </mesh>
+
+        {/* CVV on back */}
+        <mesh position={[0.3, 0.85, -0.016]}>
+          <boxGeometry args={[0.12, 0.04, 0.001]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            roughness={0.6}
+          />
+        </mesh>
+
+        {/* Warning light indicator */}
+        <mesh position={[0, 1.3, 0]}>
+          <sphereGeometry args={[0.05, 16, 16]} />
+          <meshStandardMaterial 
+            color="#ff0000"
+            emissive="#ff0000"
+            emissiveIntensity={isSelected ? 1 : 0.5}
+          />
+          {isSelected && <pointLight intensity={0.5} distance={2} color="#ff0000" />}
+        </mesh>
+
+        {/* Holographic security feature */}
+        <mesh ref={hologramRef} position={[0.1, 0.9, 0.025]}>
+          <boxGeometry args={[0.2, 0.15, 0.005]} />
+          <meshStandardMaterial 
+            color="#00ffff"
+            transparent
+            opacity={0.3}
+            emissive="#00ffff"
+            emissiveIntensity={0.5}
+          />
+        </mesh>
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 1.5, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+
+        <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+          ${balance.toFixed(2)}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
+// Legal Document/Contract Component
+function LegalDocument({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+  const pagesRef = useRef([]);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+
+    // Animated pages flipping when selected
+    pagesRef.current.forEach((page, i) => {
+      if (page && isSelected) {
+        page.rotation.y = Math.sin(state.clock.elapsedTime * 2 + i * 0.5) * 0.3;
+      } else if (page) {
+        page.rotation.y = 0;
+      }
+    });
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Marble pedestal */}
+        <mesh position={[0, 0.4, 0]} castShadow>
+          <cylinderGeometry args={[0.25, 0.3, 0.6, 32]} />
+          <meshStandardMaterial 
+            color={hovered ? "#d4d4d4" : "#c0c0c0"}
+            roughness={0.2}
+            metalness={0.3}
+          />
+        </mesh>
+
+        {/* Pedestal top */}
+        <mesh position={[0, 0.72, 0]} castShadow>
+          <cylinderGeometry args={[0.35, 0.3, 0.05, 32]} />
+          <meshStandardMaterial 
+            color="#a0a0a0"
+            roughness={0.2}
+            metalness={0.4}
+          />
+        </mesh>
+
+        {/* Document folder/binder base */}
+        <mesh position={[0, 0.78, 0]} castShadow>
+          <boxGeometry args={[0.6, 0.05, 0.45]} />
+          <meshStandardMaterial 
+            color="#2a2a2a"
+            roughness={0.6}
+          />
+        </mesh>
+
+        {/* Main document pages stack */}
+        {[0, 1, 2, 3, 4].map((i) => (
+          <mesh 
+            key={i}
+            ref={(el) => pagesRef.current[i] = el}
+            position={[0, 0.81 + i * 0.002, 0]} 
+            castShadow
+          >
+            <boxGeometry args={[0.55, 0.001, 0.4]} />
+            <meshStandardMaterial 
+              color="#f5f5f5"
+              roughness={0.8}
+            />
+          </mesh>
+        ))}
+
+        {/* Top document with text lines */}
+        <mesh position={[0, 0.83, 0]} castShadow>
+          <boxGeometry args={[0.55, 0.002, 0.4]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            roughness={0.7}
+          />
+        </mesh>
+
+        {/* Document header */}
+        <mesh position={[0, 0.835, 0.15]}>
+          <boxGeometry args={[0.4, 0.003, 0.06]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* Text lines on document */}
+        {[0.08, 0.04, 0, -0.04, -0.08, -0.12].map((z, i) => (
+          <mesh key={i} position={[0, 0.835, z]}>
+            <boxGeometry args={[0.45, 0.003, 0.01]} />
+            <meshStandardMaterial 
+              color="#4a4a4a"
+              roughness={0.9}
+            />
+          </mesh>
+        ))}
+
+        {/* Signature line */}
+        <mesh position={[0.1, 0.835, -0.16]}>
+          <boxGeometry args={[0.25, 0.003, 0.01]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* Signature (scribble effect) */}
+        <mesh position={[0.1, 0.836, -0.16]}>
+          <torusGeometry args={[0.04, 0.005, 8, 16]} />
+          <meshStandardMaterial 
+            color="#0000ff"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Official seal/stamp */}
+        <mesh position={[-0.15, 0.836, -0.14]} rotation={[0, 0, Math.PI / 6]}>
+          <cylinderGeometry args={[0.06, 0.06, 0.005, 32]} />
+          <meshStandardMaterial 
+            color="#cc0000"
+            emissive="#cc0000"
+            emissiveIntensity={0.3}
+            roughness={0.7}
+          />
+        </mesh>
+
+        {/* Seal inner circle */}
+        <mesh position={[-0.15, 0.837, -0.14]} rotation={[0, 0, Math.PI / 6]}>
+          <cylinderGeometry args={[0.04, 0.04, 0.006, 32]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Paper clips */}
+        {[-0.2, 0.2].map((x, i) => (
+          <mesh key={i} position={[x, 0.84, 0.15]} rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[0.03, 0.008, 8, 16, Math.PI]} />
+            <meshStandardMaterial 
+              color="#c0c0c0"
+              roughness={0.2}
+              metalness={0.9}
+            />
+          </mesh>
+        ))}
+
+        {/* Ribbon/bookmark */}
+        <mesh position={[0.25, 0.8, 0]} castShadow>
+          <boxGeometry args={[0.04, 0.3, 0.01]} />
+          <meshStandardMaterial 
+            color="#8b0000"
+            roughness={0.6}
+          />
+        </mesh>
+
+        {/* Wax seal on folder */}
+        <mesh position={[0, 0.78, 0.23]}>
+          <cylinderGeometry args={[0.05, 0.05, 0.02, 32]} />
+          <meshStandardMaterial 
+            color="#8b0000"
+            roughness={0.4}
+          />
+        </mesh>
+
+        {/* Urgent/important stamp */}
+        <mesh position={[0.15, 0.836, 0.05]} rotation={[0, 0, Math.PI / 8]}>
+          <boxGeometry args={[0.15, 0.06, 0.002]} />
+          <meshStandardMaterial 
+            color="#ff0000"
+            transparent
+            opacity={0.6}
+            emissive="#ff0000"
+            emissiveIntensity={0.2}
+          />
+        </mesh>
+
+        {/* Warning lights on pedestal */}
+        {[0, Math.PI * 2 / 3, Math.PI * 4 / 3].map((angle, i) => (
+          <mesh key={i} position={[Math.cos(angle) * 0.3, 0.4, Math.sin(angle) * 0.3]}>
+            <sphereGeometry args={[0.02, 16, 16]} />
+            <meshStandardMaterial 
+              color="#ff6b00"
+              emissive="#ff6b00"
+              emissiveIntensity={isSelected ? 1 : 0.3}
+            />
+          </mesh>
+        ))}
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 1.3, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+
+        <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+          ${balance.toFixed(2)}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
+// Invoice Stack/Bills Component
+function InvoiceStack({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+  const invoicesRef = useRef([]);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+
+    // Animated floating invoices
+    invoicesRef.current.forEach((invoice, i) => {
+      if (invoice && isSelected) {
+        invoice.position.y = 0.8 + i * 0.08 + Math.sin(state.clock.elapsedTime * 2 + i) * 0.05;
+        invoice.rotation.y = Math.sin(state.clock.elapsedTime + i) * 0.1;
+      } else if (invoice) {
+        invoice.position.y = 0.8 + i * 0.08;
+        invoice.rotation.y = i * 0.05;
+      }
+    });
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Desk/table surface */}
+        <mesh position={[0, 0.15, 0]} castShadow>
+          <boxGeometry args={[0.9, 0.08, 0.7]} />
+          <meshStandardMaterial 
+            color={hovered ? "#6b4423" : "#5c3a1f"}
+            roughness={0.6}
+          />
+        </mesh>
+
+        {/* Wooden texture lines */}
+        {[-0.3, -0.15, 0, 0.15, 0.3].map((x, i) => (
+          <mesh key={i} position={[x, 0.19, 0]}>
+            <boxGeometry args={[0.02, 0.005, 0.7]} />
+            <meshStandardMaterial 
+              color="#4a2f1a"
+              roughness={0.8}
+            />
+          </mesh>
+        ))}
+
+        {/* Filing tray */}
+        <mesh position={[0, 0.25, 0]} castShadow>
+          <boxGeometry args={[0.65, 0.05, 0.5]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.4}
+            metalness={0.6}
+          />
+        </mesh>
+
+        {/* Tray sides */}
+        {[-0.325, 0.325].map((x, i) => (
+          <mesh key={`side-${i}`} position={[x, 0.35, 0]} castShadow>
+            <boxGeometry args={[0.02, 0.15, 0.5]} />
+            <meshStandardMaterial 
+              color="#1a1a1a"
+              roughness={0.4}
+              metalness={0.6}
+            />
+          </mesh>
+        ))}
+        {[-0.25, 0.25].map((z, i) => (
+          <mesh key={`front-${i}`} position={[0, 0.35, z]} castShadow>
+            <boxGeometry args={[0.65, 0.15, 0.02]} />
+            <meshStandardMaterial 
+              color="#1a1a1a"
+              roughness={0.4}
+              metalness={0.6}
+            />
+          </mesh>
+        ))}
+
+        {/* Stack of invoices/bills */}
+        {[0, 1, 2, 3, 4, 5].map((i) => {
+          const colors = ['#ffffff', '#ffe6e6', '#fff9e6', '#e6f9ff', '#ffe6f9', '#f0fff0'];
+          return (
+            <mesh 
+              key={i}
+              ref={(el) => invoicesRef.current[i] = el}
+              position={[
+                Math.sin(i * 0.3) * 0.05,
+                0.8 + i * 0.08,
+                Math.cos(i * 0.3) * 0.05
+              ]} 
+              rotation={[0, i * 0.05, 0]}
+              castShadow
+            >
+              <boxGeometry args={[0.45, 0.001, 0.32]} />
+              <meshStandardMaterial 
+                color={colors[i]}
+                roughness={0.9}
+              />
+            </mesh>
+          );
+        })}
+
+        {/* Top invoice details */}
+        <group position={[0, 1.31, 0]}>
+          {/* Invoice header */}
+          <mesh position={[0, 0.001, 0.12]}>
+            <boxGeometry args={[0.35, 0.002, 0.05]} />
+            <meshStandardMaterial 
+              color="#ff0000"
+              roughness={0.8}
+            />
+          </mesh>
+
+          {/* "OVERDUE" stamp */}
+          <mesh position={[0.1, 0.002, 0.05]} rotation={[0, 0, Math.PI / 8]}>
+            <boxGeometry args={[0.12, 0.05, 0.002]} />
+            <meshStandardMaterial 
+              color="#ff0000"
+              transparent
+              opacity={0.7}
+              emissive="#ff0000"
+              emissiveIntensity={isSelected ? 0.5 : 0.2}
+            />
+          </mesh>
+
+          {/* Invoice lines */}
+          {[0.06, 0.02, -0.02, -0.06, -0.10].map((z, i) => (
+            <mesh key={i} position={[0, 0.001, z]}>
+              <boxGeometry args={[0.38, 0.002, 0.008]} />
+              <meshStandardMaterial 
+                color="#1a1a1a"
+                roughness={0.9}
+              />
+            </mesh>
+          ))}
+
+          {/* Amount highlighted */}
+          <mesh position={[0, 0.002, -0.12]}>
+            <boxGeometry args={[0.15, 0.002, 0.03]} />
+            <meshStandardMaterial 
+              color="#ffff00"
+              emissive="#ffff00"
+              emissiveIntensity={0.3}
+            />
+          </mesh>
+        </group>
+
+        {/* Calculator */}
+        <mesh position={[0.35, 0.22, -0.15]} rotation={[0, -Math.PI / 6, 0]} castShadow>
+          <boxGeometry args={[0.12, 0.03, 0.18]} />
+          <meshStandardMaterial 
+            color="#2a2a2a"
+            roughness={0.4}
+          />
+        </mesh>
+
+        {/* Calculator display */}
+        <mesh position={[0.35, 0.24, -0.08]} rotation={[0, -Math.PI / 6, 0]}>
+          <boxGeometry args={[0.1, 0.005, 0.04]} />
+          <meshStandardMaterial 
+            color="#003300"
+            emissive="#00ff00"
+            emissiveIntensity={isSelected ? 0.8 : 0.3}
+          />
+        </mesh>
+
+        {/* Calculator buttons */}
+        {Array.from({ length: 4 }).map((_, row) =>
+          Array.from({ length: 3 }).map((_, col) => (
+            <mesh 
+              key={`btn-${row}-${col}`}
+              position={[
+                0.35 + (col - 1) * 0.03,
+                0.24,
+                -0.12 + row * 0.025
+              ]}
+              rotation={[0, -Math.PI / 6, 0]}
+            >
+              <boxGeometry args={[0.02, 0.003, 0.02]} />
+              <meshStandardMaterial 
+                color="#4a4a4a"
+                roughness={0.6}
+              />
+            </mesh>
+          ))
+        )}
+
+        {/* Pen/marker */}
+        <mesh position={[-0.25, 0.2, 0.1]} rotation={[0, 0, Math.PI / 4]} castShadow>
+          <cylinderGeometry args={[0.01, 0.01, 0.15, 16]} />
+          <meshStandardMaterial 
+            color="#0066cc"
+            roughness={0.4}
+            metalness={0.6}
+          />
+        </mesh>
+
+        {/* Pen cap */}
+        <mesh position={[-0.25, 0.27, 0.1]} rotation={[0, 0, Math.PI / 4]}>
+          <cylinderGeometry args={[0.012, 0.01, 0.03, 16]} />
+          <meshStandardMaterial 
+            color="#003399"
+            roughness={0.3}
+            metalness={0.7}
+          />
+        </mesh>
+
+        {/* Coffee mug with stain */}
+        <mesh position={[-0.35, 0.24, -0.2]} castShadow>
+          <cylinderGeometry args={[0.05, 0.045, 0.08, 32]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            roughness={0.3}
+          />
+        </mesh>
+
+        {/* Coffee inside */}
+        <mesh position={[-0.35, 0.26, -0.2]}>
+          <cylinderGeometry args={[0.045, 0.04, 0.02, 32]} />
+          <meshStandardMaterial 
+            color="#3d2817"
+            roughness={0.2}
+          />
+        </mesh>
+
+        {/* Mug handle */}
+        <mesh position={[-0.4, 0.24, -0.2]} rotation={[0, 0, Math.PI / 2]}>
+          <torusGeometry args={[0.03, 0.008, 16, 32, Math.PI]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            roughness={0.3}
+          />
+        </mesh>
+
+        {/* Coffee stain on desk */}
+        <mesh position={[-0.3, 0.191, -0.25]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.06, 32]} />
+          <meshStandardMaterial 
+            color="#6b4423"
+            transparent
+            opacity={0.3}
+          />
+        </mesh>
+
+        {/* Sticky notes */}
+        {[0, 1, 2].map((i) => (
+          <mesh 
+            key={i}
+            position={[0.25, 0.2 + i * 0.002, 0.15]} 
+            castShadow
+          >
+            <boxGeometry args={[0.08, 0.001, 0.08]} />
+            <meshStandardMaterial 
+              color={['#ffff99', '#ff99cc', '#99ccff'][i]}
+              roughness={0.9}
+            />
+          </mesh>
+        ))}
+
+        {/* Paper clips scattered */}
+        {[-0.15, -0.05, 0.05].map((x, i) => (
+          <mesh key={i} position={[x, 0.2, -0.28]} rotation={[Math.PI / 2, 0, i * Math.PI / 4]}>
+            <torusGeometry args={[0.015, 0.003, 8, 16, Math.PI]} />
+            <meshStandardMaterial 
+              color="#c0c0c0"
+              roughness={0.2}
+              metalness={0.9}
+            />
+          </mesh>
+        ))}
+
+        {/* Stress indicator - red exclamation marks */}
+        {isSelected && (
+          <>
+            <Text position={[-0.4, 1.5, 0]} fontSize={0.2} color="#ff0000" anchorX="center" anchorY="middle">
+              !
+            </Text>
+            <Text position={[0.4, 1.5, 0]} fontSize={0.2} color="#ff0000" anchorX="center" anchorY="middle">
+              !
+            </Text>
+          </>
+        )}
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 1.7, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+
+        <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+          ${balance.toFixed(2)}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
+// House with Mortgage Sign Component
+function MortgageHouse({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+  const signRef = useRef();
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+
+    // Swinging sign
+    if (signRef.current) {
+      signRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+    }
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Lawn/ground */}
+        <mesh position={[0, 0.11, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.75, 32]} />
+          <meshStandardMaterial 
+            color="#2d5016"
+            roughness={0.95}
+          />
+        </mesh>
+
+        {/* House foundation */}
+        <mesh position={[0, 0.25, 0]} castShadow>
+          <boxGeometry args={[0.7, 0.15, 0.6]} />
+          <meshStandardMaterial 
+            color="#4a4a4a"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Main house body */}
+        <mesh position={[0, 0.6, 0]} castShadow>
+          <boxGeometry args={[0.65, 0.5, 0.55]} />
+          <meshStandardMaterial 
+            color={hovered ? "#d4a574" : "#c19a6b"}
+            roughness={0.7}
+          />
+        </mesh>
+
+        {/* Brick texture lines - horizontal */}
+        {Array.from({ length: 8 }).map((_, row) => (
+          <group key={`row-${row}`}>
+            {Array.from({ length: 6 }).map((_, col) => (
+              <mesh 
+                key={`brick-${row}-${col}`}
+                position={[-0.25 + col * 0.11, 0.4 + row * 0.065, 0.276]}
+              >
+                <boxGeometry args={[0.1, 0.06, 0.002]} />
+                <meshStandardMaterial 
+                  color="#8b4513"
+                  roughness={0.9}
+                />
+              </mesh>
+            ))}
+          </group>
+        ))}
+
+        {/* Roof */}
+        <mesh position={[0, 1.0, 0]} rotation={[0, 0, 0]} castShadow>
+          <coneGeometry args={[0.5, 0.4, 4]} />
+          <meshStandardMaterial 
+            color="#8b4513"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Chimney */}
+        <mesh position={[0.2, 1.1, -0.15]} castShadow>
+          <boxGeometry args={[0.1, 0.3, 0.1]} />
+          <meshStandardMaterial 
+            color="#8b0000"
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* Chimney top */}
+        <mesh position={[0.2, 1.27, -0.15]}>
+          <boxGeometry args={[0.12, 0.03, 0.12]} />
+          <meshStandardMaterial 
+            color="#6b0000"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Front door */}
+        <mesh position={[0, 0.45, 0.276]} castShadow>
+          <boxGeometry args={[0.15, 0.3, 0.02]} />
+          <meshStandardMaterial 
+            color="#5c4033"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Door knob */}
+        <mesh position={[0.05, 0.45, 0.287]}>
+          <sphereGeometry args={[0.015, 16, 16]} />
+          <meshStandardMaterial 
+            color="#ffd700"
+            roughness={0.2}
+            metalness={0.9}
+          />
+        </mesh>
+
+        {/* Windows */}
+        {[[-0.2, 0.6], [0.2, 0.6]].map((pos, i) => (
+          <group key={i}>
+            <mesh position={[pos[0], pos[1], 0.276]} castShadow>
+              <boxGeometry args={[0.12, 0.15, 0.02]} />
+              <meshStandardMaterial 
+                color="#87ceeb"
+                roughness={0.1}
+                metalness={0.8}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+            {/* Window frame cross */}
+            <mesh position={[pos[0], pos[1], 0.28]}>
+              <boxGeometry args={[0.12, 0.01, 0.005]} />
+              <meshStandardMaterial color="#ffffff" />
+            </mesh>
+            <mesh position={[pos[0], pos[1], 0.28]}>
+              <boxGeometry args={[0.01, 0.15, 0.005]} />
+              <meshStandardMaterial color="#ffffff" />
+            </mesh>
+          </group>
+        ))}
+
+        {/* Attic window */}
+        <mesh position={[0, 0.95, 0.25]} castShadow>
+          <circleGeometry args={[0.06, 32]} />
+          <meshStandardMaterial 
+            color="#87ceeb"
+            roughness={0.1}
+            metalness={0.8}
+            transparent
+            opacity={0.6}
+          />
+        </mesh>
+
+        {/* Front porch steps */}
+        {[0, 1, 2].map((i) => (
+          <mesh key={i} position={[0, 0.18 + i * 0.05, 0.38 + i * 0.06]} castShadow>
+            <boxGeometry args={[0.25, 0.03, 0.1]} />
+            <meshStandardMaterial 
+              color="#808080"
+              roughness={0.9}
+            />
+          </mesh>
+        ))}
+
+        {/* Mailbox */}
+        <mesh position={[-0.5, 0.35, 0.3]} castShadow>
+          <cylinderGeometry args={[0.03, 0.03, 0.5, 16]} />
+          <meshStandardMaterial 
+            color="#2a2a2a"
+            roughness={0.4}
+            metalness={0.7}
+          />
+        </mesh>
+
+        <mesh position={[-0.5, 0.62, 0.3]} castShadow>
+          <boxGeometry args={[0.08, 0.06, 0.12]} />
+          <meshStandardMaterial 
+            color="#cc0000"
+            roughness={0.5}
+          />
+        </mesh>
+
+        {/* Mailbox flag */}
+        <mesh position={[-0.54, 0.63, 0.3]} rotation={[0, 0, Math.PI / 4]}>
+          <boxGeometry args={[0.03, 0.05, 0.01]} />
+          <meshStandardMaterial 
+            color="#ff0000"
+            emissive="#ff0000"
+            emissiveIntensity={0.3}
+          />
+        </mesh>
+
+        {/* "FOR SALE" sign post */}
+        <mesh position={[0.45, 0.45, 0.2]} castShadow>
+          <cylinderGeometry args={[0.02, 0.02, 0.8, 16]} />
+          <meshStandardMaterial 
+            color="#5c4033"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Sign board */}
+        <group ref={signRef} position={[0.45, 0.85, 0.2]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.3, 0.2, 0.02]} />
+            <meshStandardMaterial 
+              color="#ffffff"
+              roughness={0.6}
+            />
+          </mesh>
+
+          {/* "MORTGAGE" text on sign */}
+          <mesh position={[0, 0.05, 0.012]}>
+            <boxGeometry args={[0.25, 0.04, 0.002]} />
+            <meshStandardMaterial 
+              color="#ff0000"
+              roughness={0.9}
+            />
+          </mesh>
+
+          <mesh position={[0, -0.03, 0.012]}>
+            <boxGeometry args={[0.22, 0.06, 0.002]} />
+            <meshStandardMaterial 
+              color="#1a1a1a"
+              roughness={0.9}
+            />
+          </mesh>
+
+          {/* Chain holding sign */}
+          <mesh position={[-0.12, 0.11, 0]} rotation={[0, 0, -Math.PI / 6]}>
+            <cylinderGeometry args={[0.005, 0.005, 0.08, 8]} />
+            <meshStandardMaterial 
+              color="#c0c0c0"
+              roughness={0.4}
+              metalness={0.8}
+            />
+          </mesh>
+          <mesh position={[0.12, 0.11, 0]} rotation={[0, 0, Math.PI / 6]}>
+            <cylinderGeometry args={[0.005, 0.005, 0.08, 8]} />
+            <meshStandardMaterial 
+              color="#c0c0c0"
+              roughness={0.4}
+              metalness={0.8}
+            />
+          </mesh>
+        </group>
+
+        {/* Garden flowers */}
+        {[-0.3, -0.15, 0.15, 0.3].map((x, i) => (
+          <mesh key={i} position={[x, 0.13, 0.5]}>
+            <sphereGeometry args={[0.03, 8, 8]} />
+            <meshStandardMaterial 
+              color={['#ff6b9d', '#ffd700', '#9c27b0', '#ff5722'][i]}
+              emissive={['#ff6b9d', '#ffd700', '#9c27b0', '#ff5722'][i]}
+              emissiveIntensity={0.3}
+            />
+          </mesh>
+        ))}
+
+        {/* Warning chain around property */}
+        {[0, Math.PI / 2, Math.PI, Math.PI * 3 / 2].map((angle, i) => (
+          <mesh 
+            key={i}
+            position={[Math.cos(angle) * 0.6, 0.15, Math.sin(angle) * 0.6]}
+            rotation={[0, angle + Math.PI / 4, 0]}
+          >
+            <cylinderGeometry args={[0.008, 0.008, 0.3, 8]} />
+            <meshStandardMaterial 
+              color="#ffff00"
+              emissive="#ffff00"
+              emissiveIntensity={0.2}
+            />
+          </mesh>
+        ))}
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 1.4, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+
+        <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+          ${balance.toFixed(2)}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
+// Tax Form/Government Building Component
+function TaxForm({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Government building base */}
+        <mesh position={[0, 0.2, 0]} castShadow>
+          <boxGeometry args={[0.9, 0.3, 0.7]} />
+          <meshStandardMaterial 
+            color="#2a2a2a"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Columns */}
+        {[-0.3, 0.3].map((x, i) => (
+          <mesh key={i} position={[x, 0.65, -0.3]} castShadow>
+            <cylinderGeometry args={[0.05, 0.08, 0.7, 32]} />
+            <meshStandardMaterial 
+              color={hovered ? "#d4d4d4" : "#c0c0c0"}
+              roughness={0.3}
+              metalness={0.3}
+            />
+          </mesh>
+        ))}
+
+        {/* Main building body */}
+        <mesh position={[0, 0.8, 0]} castShadow>
+          <boxGeometry args={[0.65, 0.8, 0.55]} />
+          <meshStandardMaterial 
+            color={hovered ? "#4a5568" : "#2d3748"}
+            roughness={0.5}
+            metalness={0.2}
+          />
+        </mesh>
+
+        {/* Tax form scroll on pedestal */}
+        <mesh position={[0, 0.4, 0.35]} castShadow>
+          <cylinderGeometry args={[0.08, 0.08, 0.3, 32]} />
+          <meshStandardMaterial 
+            color="#8b4513"
+            roughness={0.7}
+          />
+        </mesh>
+
+        {/* Document scroll */}
+        <mesh position={[0, 0.55, 0.35]} rotation={[0, Math.PI / 6, 0]}>
+          <boxGeometry args={[0.4, 0.001, 0.6]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* "TAX" text on scroll */}
+        <mesh position={[0, 0.55, 0.65]} rotation={[0, Math.PI / 6, 0]}>
+          <boxGeometry args={[0.25, 0.002, 0.08]} />
+          <meshStandardMaterial 
+            color="#ff0000"
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* Government seal */}
+        <mesh position={[0, 0.87, 0.28]} castShadow>
+          <cylinderGeometry args={[0.08, 0.08, 0.02, 32]} />
+          <meshStandardMaterial 
+            color="#003366"
+            emissive="#003366"
+            emissiveIntensity={0.3}
+            roughness={0.4}
+          />
+        </mesh>
+
+        {/* Building windows */}
+        {[0.4, 0.9].map((y, floor) => (
+          <group key={floor}>
+            {[-0.2, 0.2].map((x, i) => (
+              <mesh key={i} position={[x, y, 0.28]}>
+                <boxGeometry args={[0.15, 0.15, 0.01]} />
+                <meshStandardMaterial 
+                  color="#87ceeb"
+                  roughness={0.1}
+                  metalness={0.9}
+                  emissive="#b0d4f1"
+                  emissiveIntensity={0.2}
+                />
+              </mesh>
+            ))}
+          </group>
+        ))}
+
+        {/* Building entrance */}
+        <mesh position={[0, 0.37, 0.28]}>
+          <boxGeometry args={[0.2, 0.4, 0.01]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 1.5, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+
+        <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+          ${balance.toFixed(2)}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
+// Calculator with Bills Component
+function AccruedExpensesCalculator({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Desk surface */}
+        <mesh position={[0, 0.2, 0]} castShadow>
+          <boxGeometry args={[1.2, 0.08, 0.9]} />
+          <meshStandardMaterial 
+            color="#6b4423"
+            roughness={0.7}
+          />
+        </mesh>
+
+        {/* Calculator base */}
+        <mesh position={[0.3, 0.35, 0]} castShadow>
+          <boxGeometry args={[0.45, 0.225, 0.375]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.4}
+            metalness={0.6}
+          />
+        </mesh>
+
+        {/* Calculator screen */}
+        <mesh position={[0.3, 0.43, 0.189]}>
+          <boxGeometry args={[0.375, 0.075, 0.01]} />
+          <meshStandardMaterial 
+            color="#001a00"
+            emissive="#00ff00"
+            emissiveIntensity={isSelected ? 0.8 : 0.5}
+            roughness={0.2}
+          />
+        </mesh>
+
+        {/* Calculator buttons */}
+        {Array.from({ length: 4 }).map((_, row) =>
+          Array.from({ length: 3 }).map((_, col) => (
+            <mesh 
+              key={`btn-${row}-${col}`}
+              position={[0.3 + (col - 1) * 0.075, 0.38, 0.195 + row * 0.06]}
+            >
+              <boxGeometry args={[0.0525, 0.012, 0.045]} />
+              <meshStandardMaterial 
+                color="#4a4a4a"
+                roughness={0.6}
+              />
+            </mesh>
+          ))
+        )}
+
+        {/* Stack of bills */}
+        {[0, 1, 2, 3].map((i) => {
+          const colors = ['#ffffff', '#f0f0f0', '#e0e0e0', '#d0d0d0'];
+          return (
+            <mesh 
+              key={i}
+              position={[-0.225, 0.25 + i * 0.004, 0.225]} 
+              rotation={[0, 0, i * 0.05]}
+              castShadow
+            >
+              <boxGeometry args={[0.525, 0.003, 0.375]} />
+              <meshStandardMaterial 
+                color={colors[i]}
+                roughness={0.9}
+              />
+            </mesh>
+          );
+        })}
+
+        {/* Top bill with amount */}
+        <mesh position={[-0.225, 0.265, 0.225]} castShadow>
+          <boxGeometry args={[0.525, 0.003, 0.375]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* Amount text on bill */}
+        <mesh position={[-0.225, 0.266, 0.39]}>
+          <boxGeometry args={[0.225, 0.003, 0.045]} />
+          <meshStandardMaterial 
+            color="#ff0000"
+            emissive="#ff0000"
+            emissiveIntensity={0.3}
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* Pen */}
+        <mesh position={[-0.525, 0.22, 0.3]} rotation={[0, 0, Math.PI / 4]} castShadow>
+          <cylinderGeometry args={[0.012, 0.012, 0.18, 16]} />
+          <meshStandardMaterial 
+            color="#0066cc"
+            roughness={0.4}
+            metalness={0.6}
+          />
+        </mesh>
+
+        {/* Receipt roll */}
+        <mesh position={[0.6, 0.25, -0.225]} castShadow>
+          <cylinderGeometry args={[0.06, 0.06, 0.12, 16]} />
+          <meshStandardMaterial 
+            color="#ffffff"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Warning alert */}
+        <mesh position={[-0.35, 0.6, 0]}>
+          <sphereGeometry args={[0.03, 16, 16]} />
+          <meshStandardMaterial 
+            color="#ff6b00"
+            emissive="#ff6b00"
+            emissiveIntensity={isSelected ? 1 : 0.5}
+          />
+          {isSelected && <pointLight intensity={0.5} distance={2} color="#ff6b00" />}
+        </mesh>
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 1.0, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+
+        <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+          ${balance.toFixed(2)}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
+// Promissory Note/IOU Component
+function PromissoryNote({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+  const noteRef = useRef();
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+
+    // Floating note animation
+    if (noteRef.current && isSelected) {
+      noteRef.current.position.y = 1.05 + Math.sin(state.clock.elapsedTime * 2) * 0.05;
+      noteRef.current.rotation.y = Math.sin(state.clock.elapsedTime) * 0.1;
+    }
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Standing frame */}
+        <mesh position={[0, 0.9, 0]} castShadow>
+          <boxGeometry args={[0.12, 0.75, 0.12]} />
+          <meshStandardMaterial 
+            color="#8b7355"
+            roughness={0.8}
+          />
+        </mesh>
+
+        {/* Note paper */}
+        <mesh ref={noteRef} position={[0, 1.05, 0]} castShadow>
+          <boxGeometry args={[0.75, 0.525, 0.003]} />
+          <meshStandardMaterial 
+            color={hovered ? "#ffffcc" : "#ffffe6"}
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* Note border */}
+        <mesh position={[0, 1.05, 0.004]}>
+          <boxGeometry args={[0.72, 0.495, 0.002]} />
+          <meshStandardMaterial 
+            color="#8b7355"
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* "IOU" heading */}
+        <mesh position={[0, 1.23, 0.004]}>
+          <boxGeometry args={[0.225, 0.06, 0.001]} />
+          <meshStandardMaterial 
+            color="#8b0000"
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* Handwritten text lines */}
+        {[1.125, 1.035, 0.945].map((y, i) => (
+          <mesh key={i} position={[0, y, 0.004]}>
+            <boxGeometry args={[0.6, 0.015, 0.001]} />
+            <meshStandardMaterial 
+              color="#4a4a4a"
+              roughness={0.9}
+            />
+          </mesh>
+        ))}
+
+        {/* Amount */}
+        <mesh position={[0.15, 0.885, 0.004]}>
+          <boxGeometry args={[0.18, 0.03, 0.001]} />
+          <meshStandardMaterial 
+            color="#006400"
+            emissive="#006400"
+            emissiveIntensity={0.3}
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* Signature line */}
+        <mesh position={[-0.15, 0.855, 0.004]}>
+          <boxGeometry args={[0.3, 0.015, 0.001]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.9}
+          />
+        </mesh>
+
+        {/* Broken seal */}
+        <mesh position={[-0.225, 1.125, 0.004]} rotation={[0, 0, Math.PI / 6]}>
+          <cylinderGeometry args={[0.06, 0.06, 0.003, 32]} />
+          <meshStandardMaterial 
+            color="#8b0000"
+            roughness={0.7}
+          />
+        </mesh>
+
+        {/* Crumpled paper effect */}
+        {[-0.225, 0, 0.225].map((x, i) => (
+          <mesh key={i} position={[x, 1.058, 0.001]} rotation={[0, 0, i * 0.02]}>
+            <boxGeometry args={[0.03, 0.03, 0.001]} />
+            <meshStandardMaterial 
+              color="#d0d0d0"
+              roughness={0.9}
+            />
+          </mesh>
+        ))}
+
+        {/* Warning light */}
+        <mesh position={[0.45, 1.35, 0]}>
+          <sphereGeometry args={[0.025, 16, 16]} />
+          <meshStandardMaterial 
+            color="#ff4444"
+            emissive="#ff4444"
+            emissiveIntensity={isSelected ? 1 : 0.5}
+          />
+          {isSelected && <pointLight intensity={0.3} distance={2} color="#ff4444" />}
+        </mesh>
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 1.65, 0]} fontSize={0.25} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.03} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+
+        <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+          ${balance.toFixed(2)}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
+// Stock Market Display Component (for Investments)
+function StockMarketDisplay({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+  const chartLineRef = useRef();
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+
+    // Animated stock chart line
+    if (chartLineRef.current && isSelected) {
+      chartLineRef.current.position.y = 1.1 + Math.sin(state.clock.elapsedTime * 3) * 0.05;
+    }
+  });
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Monitor stand base */}
+        <mesh position={[0, 0.15, 0]} castShadow>
+          <cylinderGeometry args={[0.2, 0.25, 0.1, 32]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.3}
+            metalness={0.8}
+          />
+        </mesh>
+
+        {/* Monitor stand arm */}
+        <mesh position={[0, 0.3, 0]} castShadow>
+          <cylinderGeometry args={[0.08, 0.08, 0.3, 16]} />
+          <meshStandardMaterial 
+            color="#2a2a2a"
+            roughness={0.4}
+            metalness={0.7}
+          />
+        </mesh>
+
+        {/* Monitor screen */}
+        <mesh position={[0, 0.8, 0]} castShadow>
+          <boxGeometry args={[1.2, 0.75, 0.05]} />
+          <meshStandardMaterial 
+            color={hovered ? "#1a3a1a" : "#0a1a0a"}
+            roughness={0.2}
+            metalness={0.6}
+            emissive="#00ff00"
+            emissiveIntensity={isSelected ? 0.5 : 0.3}
+          />
+        </mesh>
+
+        {/* Screen frame */}
+        <mesh position={[0, 0.8, 0.03]}>
+          <boxGeometry args={[1.25, 0.8, 0.02]} />
+          <meshStandardMaterial 
+            color="#1a1a1a"
+            roughness={0.3}
+            metalness={0.8}
+          />
+        </mesh>
+
+        {/* Stock chart grid lines */}
+        {[0.65, 0.75, 0.85, 0.95].map((y, i) => (
+          <mesh key={i} position={[0, y, 0.03]}>
+            <boxGeometry args={[1.0, 0.001, 0.01]} />
+            <meshStandardMaterial 
+              color="#003300"
+              emissive="#00aa00"
+              emissiveIntensity={0.1}
+            />
+          </mesh>
+        ))}
+
+        {[-0.45, -0.15, 0.15, 0.45].map((x, i) => (
+          <mesh key={i} position={[x, 0.8, 0.03]}>
+            <boxGeometry args={[0.001, 0.6, 0.01]} />
+            <meshStandardMaterial 
+              color="#003300"
+              emissive="#00aa00"
+              emissiveIntensity={0.1}
+            />
+          </mesh>
+        ))}
+
+        {/* Animated stock chart line */}
+        <group ref={chartLineRef} position={[0, 1.1, 0.03]}>
+          <mesh>
+            <boxGeometry args={[0.9, 0.01, 0.01]} />
+            <meshStandardMaterial 
+              color="#00ff00"
+              emissive="#00ff00"
+              emissiveIntensity={isSelected ? 0.8 : 0.5}
+            />
+          </mesh>
+          {/* Chart data points */}
+          {[-0.4, -0.15, 0.075, 0.3].map((x, i) => (
+            <mesh key={i} position={[x, i % 2 === 0 ? 0.1 : -0.1, 0]}>
+              <sphereGeometry args={[0.015, 16, 16]} />
+              <meshStandardMaterial 
+                color="#00ff00"
+                emissive="#00ff00"
+                emissiveIntensity={1}
+              />
+            </mesh>
+          ))}
+        </group>
+
+        {/* Stock ticker symbols */}
+        {["AAPL", "GOOGL", "MSFT"].map((symbol, i) => (
+          <mesh key={i} position={[-0.45 + i * 0.225, 0.98, 0.03]}>
+            <boxGeometry args={[0.15, 0.03, 0.01]} />
+            <meshStandardMaterial 
+              color="#00ff00"
+              emissive="#00ff00"
+              emissiveIntensity={0.3}
+            />
+          </mesh>
+        ))}
+
+        {/* Price indicators */}
+        {[0, 1, 2].map((i) => (
+          <mesh key={i} position={[-0.5 + i * 0.375, 0.58, 0.03]}>
+            <boxGeometry args={[0.075, 0.022, 0.01]} />
+            <meshStandardMaterial 
+              color={i === 0 ? "#ff0000" : "#00ff00"}
+              emissive={i === 0 ? "#ff0000" : "#00ff00"}
+              emissiveIntensity={0.4}
+            />
+          </mesh>
+        ))}
+
+        {/* Green/red status lights */}
+        {[-0.5, 0.5].map((x, i) => (
+          <mesh key={i} position={[x, 1.08, 0.03]}>
+            <sphereGeometry args={[0.03, 16, 16]} />
+            <meshStandardMaterial 
+              color={i === 0 ? "#00ff00" : "#ff0000"}
+              emissive={i === 0 ? "#00ff00" : "#ff0000"}
+              emissiveIntensity={isSelected ? 1 : 0.5}
+            />
+          </mesh>
+        ))}
+
+        {/* Monitor base/stand bottom */}
+        <mesh position={[0, 0.18, 0]} castShadow>
+          <cylinderGeometry args={[0.25, 0.3, 0.05, 32]} />
+          <meshStandardMaterial 
+            color="#2a2a2a"
+            roughness={0.4}
+            metalness={0.6}
+          />
+        </mesh>
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 1.45, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+
+        <Text position={[0, -0.6, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+          ${balance.toFixed(2)}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
 // Stylized Tree Component (replacing boxes)
 function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
   const groupRef = useRef();
@@ -171,7 +3384,7 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
   // Color logic: Keep original colors when viewing, only change in journal mode
   const baseColor = isAsset ? '#2d5016' : '#8b4513'; // Green for assets, brown for liabilities
   const foliageColor = isAsset ? '#4a7c3c' : '#cd853f'; // Consistent foliage colors
-  const selectedColor = isSelected ? (clickCount === 1 ? '#4ecdc4' : '#ff6b6b') : (isAsset ? '#6ea057' : '#d2691e');
+  const selectedColor = isSelected ? (clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b') : (isAsset ? '#6ea057' : '#d2691e');
 
   return (
     <group 
@@ -238,8 +3451,8 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
         <mesh position={[0, 0.02, 0]}>
             <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
           <meshStandardMaterial 
-            color={clickCount === 1 ? '#4ecdc4' : '#ff6b6b'}
-            emissive={clickCount === 1 ? '#4ecdc4' : '#ff6b6b'}
+            color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+            emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
               emissiveIntensity={0.8}
           />
         </mesh>
@@ -247,8 +3460,8 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
           <mesh position={[0, 0.05, 0]}>
             <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
             <meshStandardMaterial 
-              color={clickCount === 1 ? '#4ecdc4' : '#ff6b6b'}
-              emissive={clickCount === 1 ? '#4ecdc4' : '#ff6b6b'}
+              color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
               emissiveIntensity={0.3}
               transparent
               opacity={0.6}
@@ -271,7 +3484,7 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
       <RippleEffect 
         position={[0, 0.01, 0]} 
         visible={isSelected && clickCount > 0}
-        color={clickCount === 1 ? '#4ecdc4' : '#ff6b6b'}
+        color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
       />
 
        {/* Label */}
@@ -292,14 +3505,14 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
          <Text
            position={[0, -0.3, 0]}
            fontSize={0.2}
-           color={clickCount === 1 ? '#ffffff' : '#ffffff'}
+           color="#ffffff"
            anchorX="center"
            anchorY="middle"
            outlineWidth={0.02}
            outlineColor="#000000"
            fontWeight="bold"
          >
-           {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : ''}
+           {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
          </Text>
        )}
 
@@ -320,6 +3533,10 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
     </group>
   );
 }
+
+
+
+
 
 // Decorative Tree (non-interactive background element)
 function DecorativeTree({ position, scale = 1, treeType = 'pine' }) {
@@ -345,6 +3562,7 @@ function DecorativeTree({ position, scale = 1, treeType = 'pine' }) {
       </group>
     );
   } else {
+    
     return (
       <group position={position}>
         <mesh position={[0, 0.4 * scale, 0]}>
@@ -368,6 +3586,8 @@ function DecorativeTree({ position, scale = 1, treeType = 'pine' }) {
   }
 }
 
+
+
 // Bush/Shrub Component
 function Bush({ position, scale = 1 }) {
   return (
@@ -388,40 +3608,7 @@ function Bush({ position, scale = 1 }) {
   );
 }
 
-// Pergola/Gazebo Structure
-function Pergola({ position, size = 3 }) {
-  return (
-    <group position={position}>
-      {/* Four corner posts */}
-      {[[-1, 0, -1], [1, 0, -1], [-1, 0, 1], [1, 0, 1]].map((pos, i) => (
-        <mesh key={i} position={[pos[0] * size/2, 1.2, pos[2] * size/2]}>
-          <cylinderGeometry args={[0.08, 0.1, 2.4, 8]} />
-          <meshStandardMaterial color="#f5f5f5" roughness={0.4} />
-        </mesh>
-      ))}
-      {/* Top beams */}
-      <mesh position={[0, 2.4, 0]}>
-        <boxGeometry args={[size + 0.2, 0.12, 0.12]} />
-        <meshStandardMaterial color="#f5f5f5" roughness={0.4} />
-      </mesh>
-      <mesh position={[0, 2.4, size/3]} rotation={[0, Math.PI/2, 0]}>
-        <boxGeometry args={[size + 0.2, 0.12, 0.12]} />
-        <meshStandardMaterial color="#f5f5f5" roughness={0.4} />
-      </mesh>
-      <mesh position={[0, 2.4, -size/3]} rotation={[0, Math.PI/2, 0]}>
-        <boxGeometry args={[size + 0.2, 0.12, 0.12]} />
-        <meshStandardMaterial color="#f5f5f5" roughness={0.4} />
-      </mesh>
-      {/* Cross beams */}
-      {[-0.5, 0, 0.5].map((z, i) => (
-        <mesh key={i} position={[0, 2.3, z * size]} rotation={[0, 0, 0]}>
-          <boxGeometry args={[size * 0.8, 0.08, 0.08]} />
-          <meshStandardMaterial color="#f5f5f5" roughness={0.4} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
+
 
 // Fountain Component
 function Fountain({ position }) {
@@ -676,27 +3863,20 @@ function Railing({ position, width, orientation = 'horizontal' }) {
 // Camera Controller Component
 function CameraController({ position, target }) {
   const { camera } = useThree();
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [lastPosition, setLastPosition] = useState(null);
+  const [lastTarget, setLastTarget] = useState(null);
   
-  useFrame(() => {
-    if (camera && isTransitioning) {
-      // Smooth camera movement
-      const targetPosition = new THREE.Vector3(...position);
-      const distance = camera.position.distanceTo(targetPosition);
-      
-      if (distance > 0.1) {
-        camera.position.lerp(targetPosition, 0.05);
-        camera.lookAt(...target);
-      } else {
-        setIsTransitioning(false);
-      }
-    }
-  });
-  
-  // Update camera position when props change
+  // Only move camera when position/target actually changes
   useEffect(() => {
-    if (camera) {
-      setIsTransitioning(true);
+    const positionStr = JSON.stringify(position);
+    const targetStr = JSON.stringify(target);
+    
+    if (camera && (positionStr !== lastPosition || targetStr !== lastTarget)) {
+      const targetPosition = new THREE.Vector3(...position);
+      camera.position.copy(targetPosition);
+      camera.lookAt(...target);
+      setLastPosition(positionStr);
+      setLastTarget(targetStr);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [position, target]);
@@ -715,8 +3895,8 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
     
     const currentCount = clickCounts[accountName] || 0;
     
-    if (currentCount === 2) {
-      // Reset this account and clear selection
+    if (currentCount === 3) {
+      // Reset this account and clear selection (cycling back to 0)
       setClickCounts(prev => ({ ...prev, [accountName]: 0 }));
       setSelectedAccount(null);
     } else if (selectedAccount === accountName) {
@@ -773,25 +3953,7 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
         speed={1}
       />
       
-      {/* Clouds */}
-      <Cloud
-        position={[0, 20, 0]}
-        speed={0.4}
-        opacity={0.6}
-        color="#ffffff"
-      />
-      <Cloud
-        position={[-15, 25, -10]}
-        speed={0.2}
-        opacity={0.4}
-        color="#ffffff"
-      />
-      <Cloud
-        position={[15, 18, 5]}
-        speed={0.3}
-        opacity={0.5}
-        color="#ffffff"
-      />
+      {/* Clouds removed */}
 
       {/* Enhanced Lighting */}
       <ambientLight intensity={0.6} color="#f0f8ff" />
@@ -824,8 +3986,8 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
       {/* Grid lines for structure */}
       <gridHelper args={[40, 40, '#4a7c3c', '#4a7c3c']} position={[0, 0.01, 0]} />
 
-      {/* Fog for depth perception */}
-      <fog attach="fog" args={['#87ceeb', 10, 50]} />
+      {/* Fog for depth perception
+      <fog attach="fog" args={['#87ceeb', 10, 50]} /> */}
 
       {/* Central pathway */}
       <GardenPath position={[0, 0.02, 0]} width={2.5} length={18} />
@@ -836,22 +3998,55 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
 
       {/* ASSET SIDE (Left) - Green/Natural tones */}
       <group>
-        {/* Account trees */}
-        {assetAccounts.map((account, index) => (
-          <TreeAccount
-            key={`asset-${account.name}-${index}`}
-            name={account.name}
-            position={account.position}
-            scale={account.scale}
-            onSelect={() => handleTreeClick(account.name, true)}
-            isSelected={selectedAccount === account.name}
-            clickCount={clickCounts[account.name] || 0}
-            isAsset={true}
-            balance={accountBalances[account.name] || 0}
-          />
-        ))}
+        {/* Account objects */}
+        {assetAccounts.map((account, index) => {
+          const commonProps = {
+            key: `asset-${account.name}-${index}`,
+            name: account.name,
+            position: account.position,
+            scale: account.scale,
+            rotation: account.rotation || 0,
+            onSelect: () => handleTreeClick(account.name, true),
+            isSelected: selectedAccount === account.name,
+            clickCount: clickCounts[account.name] || 0,
+            isAsset: true,
+            balance: accountBalances[account.name] || 0
+          };
 
-        {/* Decorative background trees */}
+          if (account.type === 'bank') {
+            return <BankBuilding {...commonProps} />;
+          } else if (account.type === 'lorry') {
+            return <LorryAccount {...commonProps} />;
+          } else if (account.type === 'safe') {
+            return <SafeVault {...commonProps} />;
+          } else if (account.type === 'warehouse') {
+            return <WarehouseContainer {...commonProps} />;
+          } else if (account.type === 'machine') {
+            return <IndustrialMachine {...commonProps} />;
+          } else if (account.type === 'office') {
+            return <OfficeBuilding {...commonProps} />;
+          } else if (account.type === 'creditcard') {
+            return <CreditCard {...commonProps} />;
+          } else if (account.type === 'document') {
+            return <LegalDocument {...commonProps} />;
+          } else if (account.type === 'invoice') {
+            return <InvoiceStack {...commonProps} />;
+          } else if (account.type === 'house') {
+            return <MortgageHouse {...commonProps} />;
+          } else if (account.type === 'tax') {
+            return <TaxForm {...commonProps} />;
+          } else if (account.type === 'accrued') {
+            return <AccruedExpensesCalculator {...commonProps} />;
+          } else if (account.type === 'iou') {
+            return <PromissoryNote {...commonProps} />;
+          } else if (account.type === 'stock') {
+            return <StockMarketDisplay {...commonProps} />;
+          } else {
+            return <TreeAccount {...commonProps} />;
+          }
+        })}
+{/* 
+        Decorative background trees */}
         <DecorativeTree position={[-10, 0, 4]} scale={1.3} treeType="pine" />
         <DecorativeTree position={[-10, 0, -4]} scale={1.1} treeType="round" />
         <DecorativeTree position={[-2, 0, -5]} scale={0.9} treeType="pine" />
@@ -885,20 +4080,53 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
 
       {/* LIABILITY SIDE (Right) - Brown/Earth tones */}
       <group>
-        {/* Account trees */}
-        {liabilityAccounts.map((account, index) => (
-          <TreeAccount
-            key={`liability-${account.name}-${index}`}
-            name={account.name}
-            position={account.position}
-            scale={account.scale}
-            onSelect={() => handleTreeClick(account.name, false)}
-            isSelected={selectedAccount === account.name}
-            clickCount={clickCounts[account.name] || 0}
-            isAsset={false}
-            balance={accountBalances[account.name] || 0}
-          />
-        ))}
+        {/* Account objects */}
+        {liabilityAccounts.map((account, index) => {
+          const commonProps = {
+            key: `liability-${account.name}-${index}`,
+            name: account.name,
+            position: account.position,
+            scale: account.scale,
+            rotation: account.rotation || 0,
+            onSelect: () => handleTreeClick(account.name, false),
+            isSelected: selectedAccount === account.name,
+            clickCount: clickCounts[account.name] || 0,
+            isAsset: false,
+            balance: accountBalances[account.name] || 0
+          };
+
+          if (account.type === 'bank') {
+            return <BankBuilding {...commonProps} />;
+          } else if (account.type === 'lorry') {
+            return <LorryAccount {...commonProps} />;
+          } else if (account.type === 'safe') {
+            return <SafeVault {...commonProps} />;
+          } else if (account.type === 'warehouse') {
+            return <WarehouseContainer {...commonProps} />;
+          } else if (account.type === 'machine') {
+            return <IndustrialMachine {...commonProps} />;
+          } else if (account.type === 'office') {
+            return <OfficeBuilding {...commonProps} />;
+          } else if (account.type === 'creditcard') {
+            return <CreditCard {...commonProps} />;
+          } else if (account.type === 'document') {
+            return <LegalDocument {...commonProps} />;
+          } else if (account.type === 'invoice') {
+            return <InvoiceStack {...commonProps} />;
+          } else if (account.type === 'house') {
+            return <MortgageHouse {...commonProps} />;
+          } else if (account.type === 'tax') {
+            return <TaxForm {...commonProps} />;
+          } else if (account.type === 'accrued') {
+            return <AccruedExpensesCalculator {...commonProps} />;
+          } else if (account.type === 'iou') {
+            return <PromissoryNote {...commonProps} />;
+          } else if (account.type === 'stock') {
+            return <StockMarketDisplay {...commonProps} />;
+          } else {
+            return <TreeAccount {...commonProps} />;
+          }
+        })}
 
         {/* Decorative background trees */}
         <DecorativeTree position={[10, 0, 4]} scale={1.2} treeType="round" />
@@ -921,7 +4149,7 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
         <Railing position={[6, 0, -6]} width={10} orientation="horizontal" />
         
         {/* Advanced Decorative Elements */}
-         <Pergola position={[12, 0, 0]} size={2.5} />
+
          <Bench position={[9, 0, 3]} rotation={Math.PI/4} />
          <LampPost position={[7, 0, -5]} />
          <Topiary position={[5, 0, 1]} shape="cone" />
@@ -934,9 +4162,7 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
         {/* Central fountain */}
         <Fountain position={[0, 0, 0]} />
         
-        {/* Pergolas */}
-        <Pergola position={[-6, 0, 0]} size={4} />
-        <Pergola position={[6, 0, 0]} size={4} />
+
         
         {/* Benches */}
         <Bench position={[-3, 0, 6]} rotation={Math.PI} />
@@ -997,7 +4223,7 @@ function JournalPanel({ currentJournal, onAddEntry, onCloseJournal, onCompleteJo
   const [amount, setAmount] = useState('');
 
   const handleAddEntry = () => {
-    if (amount && !isNaN(amount) && currentJournal.selectedAccount) {
+    if (amount && !isNaN(amount) && currentJournal.selectedAccount && clickCount !== 3) {
       const transactionType = clickCount === 1 ? 'debit' : 'credit';
       
       onAddEntry({
@@ -1008,19 +4234,6 @@ function JournalPanel({ currentJournal, onAddEntry, onCloseJournal, onCompleteJo
       setAmount('');
     }
   };
-
-  const calculateNet = () => {
-    const totalDebits = currentJournal.entries
-      .filter(entry => entry.type === 'debit')
-      .reduce((sum, entry) => sum + entry.amount, 0);
-    const totalCredits = currentJournal.entries
-      .filter(entry => entry.type === 'credit')
-      .reduce((sum, entry) => sum + entry.amount, 0);
-    return totalDebits - totalCredits;
-  };
-
-  const net = calculateNet();
-  const isBalanced = Math.abs(net) < 0.01;
 
   if (!currentJournal) return null;
 
@@ -1063,19 +4276,6 @@ function JournalPanel({ currentJournal, onAddEntry, onCloseJournal, onCompleteJo
         )}
       </div>
 
-      <div style={{
-        padding: '15px',
-        marginBottom: '15px',
-        background: isBalanced ? '#e8f5e9' : '#ffebee',
-        borderRadius: '8px',
-        border: `2px solid ${isBalanced ? '#4caf50' : '#f44336'}`
-      }}>
-        <strong>Net Balance: </strong>
-        <span style={{ fontWeight: 'bold', fontSize: '18px', color: isBalanced ? '#4caf50' : '#f44336' }}>
-          {net > 0 ? `+$${net.toFixed(2)}` : net < 0 ? `-$${Math.abs(net).toFixed(2)}` : `$${net.toFixed(2)}`}
-        </span>
-        {isBalanced && <span style={{ marginLeft: '10px', color: '#4caf50' }}>✓ Balanced</span>}
-      </div>
 
       {currentJournal.selectedAccount && (
         <>
@@ -1095,15 +4295,28 @@ function JournalPanel({ currentJournal, onAddEntry, onCloseJournal, onCompleteJo
           <div style={{
             padding: '12px',
             marginBottom: '15px',
-            background: clickCount === 1 ? '#e8f5e9' : '#ffebee',
+            background: clickCount === 1 ? '#e8f5e9' : clickCount === 2 ? '#ffebee' : '#f5f5f5',
             borderRadius: '8px',
-            border: `2px solid ${clickCount === 1 ? '#4caf50' : '#f44336'}`
+            border: `2px solid ${clickCount === 1 ? '#4caf50' : clickCount === 2 ? '#f44336' : '#9b9b9b'}`
           }}>
             <strong>Transaction Type: </strong>
-            <span style={{ fontWeight: 'bold', fontSize: '16px', color: clickCount === 1 ? '#4caf50' : '#f44336' }}>
-              {clickCount === 1 ? '📈 Debit (+)' : '📉 Credit (-)'}
+            <span style={{ fontWeight: 'bold', fontSize: '16px', color: clickCount === 1 ? '#4caf50' : clickCount === 2 ? '#f44336' : '#9b9b9b' }}>
+              {clickCount === 1 ? '📈 Debit (+)' : clickCount === 2 ? '📉 Credit (-)' : '⚪ No Entry'}
             </span>
           </div>
+          {clickCount === 3 && (
+            <div style={{
+              padding: '12px',
+              marginBottom: '15px',
+              background: '#fff3cd',
+              borderRadius: '8px',
+              border: '2px solid #ffc107',
+              fontSize: '14px',
+              color: '#856404'
+            }}>
+              ⚠️ This account is set to "None" - no entry will be added
+            </div>
+          )}
           <input
             type="number"
             placeholder="Enter amount"
@@ -1141,15 +4354,14 @@ function JournalPanel({ currentJournal, onAddEntry, onCloseJournal, onCompleteJo
       <div style={{ display: 'flex', gap: '10px' }}>
         <button
           onClick={onCompleteJournal}
-          disabled={!isBalanced}
           style={{
             flex: 1,
             padding: '12px',
-            background: isBalanced ? '#4caf50' : '#ccc',
+            background: '#4caf50',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
-            cursor: isBalanced ? 'pointer' : 'not-allowed',
+            cursor: 'pointer',
             fontSize: '16px',
             fontWeight: 'bold'
           }}
@@ -1568,7 +4780,7 @@ function JournalButton({ onJournalClick, isJournalMode }) {
         border: '3px solid rgba(255,255,255,0.2)'
       }}
     >
-      {isJournalMode ? '🚪 EXIT JOURNAL' : '📖 START JOURNAL'}
+      {isJournalMode ? '🚪 EXIT ENTRY' : '➕ ADD ACCOUNT ENTRY'}
     </button>
   );
 }
@@ -2054,7 +5266,7 @@ export default function App() {
     'Short-term Debt': 0,
     // Asset accounts (right side)
     'Cash Account': 0,
-    'Savings Account': 0,
+    'HSBC Bank': 0,
     'Inventory': 0,
     'Equipment': 0,
     'Real Estate': 0,
@@ -2091,37 +5303,26 @@ export default function App() {
 
   const handleCompleteJournal = () => {
     if (currentJournal && currentJournal.entries.length > 0) {
-      const totalDebits = currentJournal.entries
-        .filter(entry => entry.type === 'debit')
-        .reduce((sum, entry) => sum + entry.amount, 0);
-      const totalCredits = currentJournal.entries
-        .filter(entry => entry.type === 'credit')
-        .reduce((sum, entry) => sum + entry.amount, 0);
+      setJournalEntries(prev => [currentJournal, ...prev]);
       
-      if (Math.abs(totalDebits - totalCredits) < 0.01) {
-        setJournalEntries(prev => [currentJournal, ...prev]);
-        
-        // Update account balances
-        setAccountBalances(prev => {
-          const newBalances = { ...prev };
-          currentJournal.entries.forEach(entry => {
-            const currentBalance = newBalances[entry.account] || 0;
-            if (entry.type === 'debit') {
-              newBalances[entry.account] = currentBalance + entry.amount;
-            } else {
-              newBalances[entry.account] = currentBalance - entry.amount;
-            }
-          });
-          return newBalances;
+      // Update account balances
+      setAccountBalances(prev => {
+        const newBalances = { ...prev };
+        currentJournal.entries.forEach(entry => {
+          const currentBalance = newBalances[entry.account] || 0;
+          if (entry.type === 'debit') {
+            newBalances[entry.account] = currentBalance + entry.amount;
+          } else {
+            newBalances[entry.account] = currentBalance - entry.amount;
+          }
         });
-        
-        setIsJournalMode(false);
-        setCurrentJournal(null);
-        setSelectedAccount(null);
-        setClickCounts({});
-      } else {
-        alert('Journal is not balanced! Debits must equal Credits.');
-      }
+        return newBalances;
+      });
+      
+      setIsJournalMode(false);
+      setCurrentJournal(null);
+      setSelectedAccount(null);
+      setClickCounts({});
     }
   };
 
