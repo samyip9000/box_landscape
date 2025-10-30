@@ -7,7 +7,7 @@ import * as THREE from 'three';
 const liabilityAccounts = [
   { name: 'Credit Card Debt', position: [8, 0, 2], scale: 1.2, type: 'creditcard' },
   { name: 'Bank Loan', position: [8, 0, -2], scale: 1.5, type: 'document' },
-  { name: 'Accounts Payable', position: [4, 0, -2], scale: 1.0, type: 'invoice' },
+  { name: 'Accounts Payable', position: [4, 0, -2], scale: 1.8, type: 'invoice' },
   { name: 'Mortgage', position: [4, 0, 2], scale: 1.8, type: 'house' },
   { name: 'Tax Payable', position: [6, 0, 0], scale: 1.3, type: 'tax' },
   { name: 'Accrued Expenses', position: [6, 0, -4], scale: 1.5, type: 'accrued' },
@@ -169,7 +169,7 @@ function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount,
     }
   });
 
-  const selectedColor = isSelected ? (clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b') : '#e60000';
+  const selectedColor = isSelected ? (clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b') : '#e60000';
 
   return (
     <group 
@@ -303,16 +303,16 @@ function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount,
           <mesh position={[0, 0.02, 0]}>
             <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
             <meshStandardMaterial 
-              color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-              emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+              emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
               emissiveIntensity={0.8}
             />
           </mesh>
           <mesh position={[0, 0.05, 0]}>
             <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
             <meshStandardMaterial 
-              color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-              emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+              emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
               emissiveIntensity={0.3}
               transparent
               opacity={0.6}
@@ -324,7 +324,7 @@ function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount,
       <RippleEffect 
         position={[0, 0.01, 0]} 
         visible={isSelected && clickCount > 0}
-        color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
       />
 
       <Text position={[0, 2.4, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -365,7 +365,7 @@ function LorryAccount({ name, position, scale, onSelect, isSelected, clickCount,
     }
   });
 
-  const selectedColor = isSelected ? (clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b') : '#ff6600';
+  const selectedColor = isSelected ? (clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b') : '#ff6600';
 
   return (
     <group 
@@ -408,16 +408,16 @@ function LorryAccount({ name, position, scale, onSelect, isSelected, clickCount,
           <mesh position={[0, 0.02, 0]}>
             <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
             <meshStandardMaterial 
-              color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-              emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+              emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
               emissiveIntensity={0.8}
             />
           </mesh>
           <mesh position={[0, 0.05, 0]}>
             <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
             <meshStandardMaterial 
-              color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-              emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+              emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
               emissiveIntensity={0.3}
               transparent
               opacity={0.6}
@@ -429,7 +429,7 @@ function LorryAccount({ name, position, scale, onSelect, isSelected, clickCount,
       <RippleEffect 
         position={[0, 0.01, 0]} 
         visible={isSelected && clickCount > 0}
-        color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
       />
 
       <Text position={[0, 1.2, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -458,16 +458,16 @@ function SafeVault({ name, position, scale, onSelect, isSelected, clickCount, is
   const doorRef = useRef();
 
   useFrame((state) => {
-    if (floatingRef.current) {
+    if (groupRef.current) {
       if (isSelected) {
-        floatingRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
-        floatingRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1 + rotation;
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1 + rotation;
       } else if (hovered) {
-        floatingRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
-        floatingRef.current.rotation.y = rotation;
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+        groupRef.current.rotation.y = rotation;
       } else {
-        floatingRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
-        floatingRef.current.rotation.y = rotation;
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = rotation;
       }
     }
     
@@ -483,11 +483,13 @@ function SafeVault({ name, position, scale, onSelect, isSelected, clickCount, is
     <group 
       ref={groupRef} 
       position={position}
+      rotation={[0, rotation, 0]}
       onClick={onSelect}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
-      <group ref={floatingRef} rotation={[0, rotation, 0]}>
+      <group ref={floatingRef}>
+
         {/* Base platform */}
         <mesh position={[0, 0.05, 0]}>
           <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
@@ -605,16 +607,16 @@ function SafeVault({ name, position, scale, onSelect, isSelected, clickCount, is
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -626,22 +628,22 @@ function SafeVault({ name, position, scale, onSelect, isSelected, clickCount, is
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
       </group>
 
-      {/* Text labels outside rotation group - always upright */}
-      <Text position={[0, 2.2, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
+      {/* Text labels outside floating group - rotated to face correctly */}
+      <Text position={[0, 2.4, 0]} rotation={[0, Math.PI / 2, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
         {name}
       </Text>
 
       {isSelected && (
-        <Text position={[0, 0.1, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
-          {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+        <Text position={[0, -0.3, 0]} rotation={[0, Math.PI / 2, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+          {clickCount === 2 ? 'DEBIT' : clickCount === 1 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
         </Text>
       )}
 
-      <Text position={[0, -0.2, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
+      <Text position={[0, -0.6, 0]} rotation={[0, Math.PI / 2, 0]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000">
         ${balance.toFixed(2)}
       </Text>
     </group>
@@ -823,16 +825,16 @@ function WarehouseContainer({ name, position, scale, onSelect, isSelected, click
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -844,7 +846,7 @@ function WarehouseContainer({ name, position, scale, onSelect, isSelected, click
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
 
         <Text position={[0, 1.6, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -1104,16 +1106,16 @@ function IndustrialMachine({ name, position, scale, onSelect, isSelected, clickC
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -1125,7 +1127,7 @@ function IndustrialMachine({ name, position, scale, onSelect, isSelected, clickC
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
 
         <Text position={[0, 1.7, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -1347,16 +1349,16 @@ function OfficeBuilding({ name, position, scale, onSelect, isSelected, clickCoun
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -1368,7 +1370,7 @@ function OfficeBuilding({ name, position, scale, onSelect, isSelected, clickCoun
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
 
         <Text position={[0, 2.1, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -1581,16 +1583,16 @@ function CreditCard({ name, position, scale, onSelect, isSelected, clickCount, i
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -1602,7 +1604,7 @@ function CreditCard({ name, position, scale, onSelect, isSelected, clickCount, i
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
 
         <Text position={[0, 1.5, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -1840,16 +1842,16 @@ function LegalDocument({ name, position, scale, onSelect, isSelected, clickCount
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -1861,7 +1863,7 @@ function LegalDocument({ name, position, scale, onSelect, isSelected, clickCount
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
 
         <Text position={[0, 1.3, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -2192,16 +2194,16 @@ function InvoiceStack({ name, position, scale, onSelect, isSelected, clickCount,
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -2213,7 +2215,7 @@ function InvoiceStack({ name, position, scale, onSelect, isSelected, clickCount,
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
 
         <Text position={[0, 1.7, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -2531,16 +2533,16 @@ function MortgageHouse({ name, position, scale, onSelect, isSelected, clickCount
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -2552,7 +2554,7 @@ function MortgageHouse({ name, position, scale, onSelect, isSelected, clickCount
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
 
         <Text position={[0, 1.4, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -2710,16 +2712,16 @@ function TaxForm({ name, position, scale, onSelect, isSelected, clickCount, isAs
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -2731,7 +2733,7 @@ function TaxForm({ name, position, scale, onSelect, isSelected, clickCount, isAs
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
 
         <Text position={[0, 1.5, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -2908,16 +2910,16 @@ function AccruedExpensesCalculator({ name, position, scale, onSelect, isSelected
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -2929,7 +2931,7 @@ function AccruedExpensesCalculator({ name, position, scale, onSelect, isSelected
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
 
         <Text position={[0, 1.0, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -3096,16 +3098,16 @@ function PromissoryNote({ name, position, scale, onSelect, isSelected, clickCoun
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -3117,7 +3119,7 @@ function PromissoryNote({ name, position, scale, onSelect, isSelected, clickCoun
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
 
         <Text position={[0, 1.65, 0]} fontSize={0.25} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.03} outlineColor="#000000">
@@ -3319,16 +3321,16 @@ function StockMarketDisplay({ name, position, scale, onSelect, isSelected, click
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.8}
               />
             </mesh>
             <mesh position={[0, 0.05, 0]}>
               <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
               <meshStandardMaterial 
-                color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-                emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
                 emissiveIntensity={0.3}
                 transparent
                 opacity={0.6}
@@ -3340,7 +3342,7 @@ function StockMarketDisplay({ name, position, scale, onSelect, isSelected, click
         <RippleEffect 
           position={[0, 0.01, 0]} 
           visible={isSelected && clickCount > 0}
-          color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
         />
 
         <Text position={[0, 1.45, 0]} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.04} outlineColor="#000000">
@@ -3384,7 +3386,7 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
   // Color logic: Keep original colors when viewing, only change in journal mode
   const baseColor = isAsset ? '#2d5016' : '#8b4513'; // Green for assets, brown for liabilities
   const foliageColor = isAsset ? '#4a7c3c' : '#cd853f'; // Consistent foliage colors
-  const selectedColor = isSelected ? (clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b') : (isAsset ? '#6ea057' : '#d2691e');
+  const selectedColor = isSelected ? (clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b') : (isAsset ? '#6ea057' : '#d2691e');
 
   return (
     <group 
@@ -3451,8 +3453,8 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
         <mesh position={[0, 0.02, 0]}>
             <cylinderGeometry args={[1.3, 1.4, 0.08, 32]} />
           <meshStandardMaterial 
-            color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-            emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+            color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+            emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
               emissiveIntensity={0.8}
           />
         </mesh>
@@ -3460,8 +3462,8 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
           <mesh position={[0, 0.05, 0]}>
             <cylinderGeometry args={[1.5, 1.5, 0.02, 32]} />
             <meshStandardMaterial 
-              color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
-              emissive={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+              color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+              emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
               emissiveIntensity={0.3}
               transparent
               opacity={0.6}
@@ -3484,7 +3486,7 @@ function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, 
       <RippleEffect 
         position={[0, 0.01, 0]} 
         visible={isSelected && clickCount > 0}
-        color={clickCount === 1 ? '#4ecdc4' : clickCount === 2 ? '#ff6b6b' : '#9b9b9b'}
+        color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
       />
 
        {/* Label */}
@@ -3885,25 +3887,12 @@ function CameraController({ position, target }) {
 }
 
 // Main Scene Component
-function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCounts, isJournalMode, accountBalances, onAccountInfoClick, cameraPosition, cameraTarget, rainIntensity }) {
+function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCounts, isJournalMode, accountBalances, onAccountInfoClick, onAccountEntryOpen, cameraPosition, cameraTarget, rainIntensity }) {
   const handleTreeClick = (accountName, isAsset) => {
-    if (!isJournalMode) {
-      // Show account info when not in journal mode
-      onAccountInfoClick(accountName, isAsset);
-      return;
-    }
-    
     const currentCount = clickCounts[accountName] || 0;
     
-    if (currentCount === 3) {
-      // Reset this account and clear selection (cycling back to 0)
-      setClickCounts(prev => ({ ...prev, [accountName]: 0 }));
-      setSelectedAccount(null);
-    } else if (selectedAccount === accountName) {
-      // Increment click count for same account
-      setClickCounts(prev => ({ ...prev, [accountName]: currentCount + 1 }));
-    } else {
-      // Select new account and reset all others
+    if (currentCount === 0) {
+      // First click - open panel with debit (2)
       setClickCounts(prev => {
         const newCounts = {};
         // Reset all other accounts
@@ -3912,11 +3901,43 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
             newCounts[acc.name] = 0;
           }
         });
-        // Set new account to 1
-        newCounts[accountName] = 1;
+        // Set new account to 2 (debit)
+        newCounts[accountName] = 2;
         return newCounts;
       });
       setSelectedAccount(accountName);
+      // Open panel
+      onAccountEntryOpen(accountName, isAsset, 2);
+    } else if (currentCount === 2 && selectedAccount === accountName) {
+      // Second click - change to credit (1)
+      setClickCounts(prev => ({ ...prev, [accountName]: 1 }));
+      onAccountEntryOpen(accountName, isAsset, 1);
+    } else if (currentCount === 1 && selectedAccount === accountName) {
+      // Third click - change to null (3)
+      setClickCounts(prev => ({ ...prev, [accountName]: 3 }));
+      onAccountEntryOpen(accountName, isAsset, 3);
+    } else if (currentCount === 3 && selectedAccount === accountName) {
+      // Fourth click - close (reset to 0)
+      setClickCounts(prev => ({ ...prev, [accountName]: 0 }));
+      setSelectedAccount(null);
+      // Close panel
+      onAccountEntryOpen(null, false, 0);
+    } else if (selectedAccount !== accountName) {
+      // Different account clicked - switch to it
+      setClickCounts(prev => {
+        const newCounts = {};
+        // Reset all other accounts
+        [...assetAccounts, ...liabilityAccounts].forEach(acc => {
+          if (acc.name !== accountName) {
+            newCounts[acc.name] = 0;
+          }
+        });
+        // Set new account to 2 (debit)
+        newCounts[accountName] = 2;
+        return newCounts;
+      });
+      setSelectedAccount(accountName);
+      onAccountEntryOpen(accountName, isAsset, 2);
     }
   };
 
@@ -3977,14 +3998,20 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
       <pointLight position={[-15, 5, 0]} intensity={0.2} color="#98fb98" distance={25} />
       <pointLight position={[15, 5, 0]} intensity={0.2} color="#f0e68c" distance={25} />
       
-      {/* Ground - white/light gray */}
-      <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[40, 40]} />
+      {/* Ground - color-coded for assets (green left) and liabilities (brown right) */}
+      {/* Left side - Green for Assets */}
+      <mesh position={[-10, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[20, 40]} />
         <meshStandardMaterial color="#2e7d32" roughness={0.9} />
+      </mesh>
+      {/* Right side - Brown for Liabilities */}
+      <mesh position={[10, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[20, 40]} />
+        <meshStandardMaterial color="#8b4513" roughness={0.9} />
       </mesh>
 
       {/* Grid lines for structure */}
-      <gridHelper args={[40, 40, '#4a7c3c', '#4a7c3c']} position={[0, 0.01, 0]} />
+      <gridHelper args={[40, 40, '#888888', '#666666']} position={[0, 0.01, 0]} />
 
       {/* Fog for depth perception
       <fog attach="fog" args={['#87ceeb', 10, 50]} /> */}
@@ -4219,6 +4246,153 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
 }
 
 // Journal Panel Component
+// Account Entry Side Panel Component
+function AccountEntrySidePanel({ account, isAsset, transactionType, clickCount, onClose, onSave, accountBalance }) {
+  const [amount, setAmount] = useState('');
+
+  const handleSave = () => {
+    if (clickCount === 3) {
+      // Don't save if on "None" state
+      return;
+    }
+    
+    const amountNum = parseFloat(amount);
+    if (!isNaN(amountNum) && amountNum > 0) {
+      onSave(account, isAsset, transactionType, amountNum);
+      setAmount('');
+    }
+  };
+
+  if (!account) return null;
+
+  return (
+    <div style={{
+      position: 'absolute',
+      top: '80px',
+      right: '20px',
+      background: 'white',
+      padding: '25px',
+      borderRadius: '15px',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+      minWidth: '400px',
+      zIndex: 1000,
+      border: '2px solid #e0e0e0'
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h3 style={{ margin: 0, color: '#333', fontSize: '24px', fontWeight: 'bold' }}>
+          💰 {account}
+        </h3>
+        <button
+          onClick={onClose}
+          style={{
+            background: '#f44336',
+            color: 'white',
+            border: 'none',
+            borderRadius: '50%',
+            width: '35px',
+            height: '35px',
+            cursor: 'pointer',
+            fontSize: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          ×
+        </button>
+      </div>
+
+      <div style={{ marginBottom: '15px', padding: '12px', background: '#f5f5f5', borderRadius: '8px' }}>
+        <div style={{ fontSize: '14px', color: '#666', marginBottom: '5px' }}>Current Balance:</div>
+        <div style={{ fontSize: '24px', fontWeight: 'bold', color: accountBalance >= 0 ? '#4caf50' : '#f44336' }}>
+          ${accountBalance.toFixed(2)}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '15px' }}>
+        <h4 style={{ color: '#555', marginBottom: '10px' }}>Transaction Type:</h4>
+        <div style={{
+          padding: '12px',
+          background: clickCount === 2 ? '#e8f5e9' : clickCount === 1 ? '#ffebee' : '#f5f5f5',
+          borderRadius: '8px',
+          border: `2px solid ${clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}`
+        }}>
+          <div style={{ 
+            fontWeight: 'bold', 
+            fontSize: '18px', 
+            color: clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b',
+            textAlign: 'center'
+          }}>
+            {clickCount === 2 ? '📈 Debit (+)' : clickCount === 1 ? '📉 Credit (-)' : '⚪ None'}
+          </div>
+          <div style={{ 
+            fontSize: '12px', 
+            color: '#666', 
+            textAlign: 'center', 
+            marginTop: '5px' 
+          }}>
+            Click on account to change type
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '15px' }}>
+        <h4 style={{ color: '#555', marginBottom: '10px' }}>Amount:</h4>
+        <input
+          type="number"
+          placeholder="Enter amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '12px',
+            borderRadius: '8px',
+            border: '2px solid #e0e0e0',
+            fontSize: '16px'
+          }}
+        />
+      </div>
+
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <button
+          onClick={handleSave}
+          disabled={clickCount === 3 || !amount || isNaN(amount) || parseFloat(amount) <= 0}
+          style={{
+            flex: 1,
+            padding: '12px',
+            background: '#2196F3',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: clickCount === 3 || !amount || isNaN(amount) || parseFloat(amount) <= 0 ? 'not-allowed' : 'pointer',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            opacity: clickCount === 3 || !amount || isNaN(amount) || parseFloat(amount) <= 0 ? 0.5 : 1
+          }}
+        >
+          {clickCount === 3 ? '⚪ No Entry' : '✅ Save'}
+        </button>
+        <button
+          onClick={onClose}
+          style={{
+            flex: 1,
+            padding: '12px',
+            background: '#757575',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: 'bold'
+          }}
+        >
+          ❌ Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function JournalPanel({ currentJournal, onAddEntry, onCloseJournal, onCompleteJournal, clickCount }) {
   const [amount, setAmount] = useState('');
 
@@ -4391,12 +4565,9 @@ function JournalPanel({ currentJournal, onAddEntry, onCloseJournal, onCompleteJo
 
 // Journal Display Component
 function JournalDisplay({ journalEntries }) {
-  const [expandedJournal, setExpandedJournal] = useState(null);
-
-  const toggleJournal = (journalId) => {
-    setExpandedJournal(expandedJournal === journalId ? null : journalId);
-  };
-
+  // Check if entries has 'entries' property (old journal format) or is a direct transaction
+  const isTransaction = (entry) => entry.account && entry.type && entry.amount !== undefined;
+  
   return (
     <div style={{
       position: 'absolute',
@@ -4412,56 +4583,76 @@ function JournalDisplay({ journalEntries }) {
       zIndex: 1000,
       border: '2px solid #e0e0e0'
     }}>
-      <h4 style={{ marginTop: 0, color: '#333' }}>📚 Journal Entries</h4>
+      <h4 style={{ marginTop: 0, color: '#333' }}>💼 Transactions</h4>
       {journalEntries.length === 0 ? (
-        <p style={{ color: '#999' }}>No journal entries yet</p>
+        <p style={{ color: '#999' }}>No transactions yet</p>
       ) : (
-        journalEntries.map((journal) => (
-          <div key={journal.id} style={{
-            marginBottom: '10px',
-            border: '2px solid #e0e0e0',
-            borderRadius: '8px',
-            overflow: 'hidden'
-          }}>
-            <div 
-              onClick={() => toggleJournal(journal.id)}
-              style={{
-                padding: '12px',
-                background: '#f5f5f5',
-                fontWeight: 'bold',
-                cursor: 'pointer',
+        journalEntries.map((entry) => {
+          // Handle both transaction objects and old journal format
+          if (isTransaction(entry)) {
+            // It's a direct transaction
+            return (
+              <div key={entry.id} style={{
+                padding: '10px',
+                marginBottom: '8px',
+                background: entry.type === 'credit' ? '#ffebee' : '#e8f5e9',
+                borderRadius: '8px',
+                fontSize: '14px',
+                border: entry.type === 'credit' ? '2px solid #f44336' : '2px solid #4caf50',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center'
-              }}
-            >
-              <div>
-                <span>Journal #{journal.id}</span>
-                <span style={{ fontSize: '12px', color: '#666', marginLeft: '10px' }}>
-                  {new Date(journal.timestamp).toLocaleString()}
-                </span>
+              }}>
+                <div>
+                  <strong style={{ display: 'block', marginBottom: '4px' }}>{entry.account}</strong>
+                  <span style={{ fontSize: '12px', color: '#666' }}>
+                    {new Date(entry.timestamp).toLocaleString()}
+                  </span>
+                </div>
+                <div style={{ 
+                  fontSize: '18px', 
+                  fontWeight: 'bold',
+                  color: entry.type === 'credit' ? '#f44336' : '#4caf50'
+                }}>
+                  {entry.type === 'credit' ? `-$${entry.amount.toFixed(2)}` : `+$${entry.amount.toFixed(2)}`}
+                </div>
               </div>
-              <span>{expandedJournal === journal.id ? '▼' : '▶'}</span>
-            </div>
-            
-            {expandedJournal === journal.id && (
-              <div style={{ padding: '12px', background: 'white' }}>
-                {journal.entries.map((entry, idx) => (
-                  <div key={idx} style={{
-                    padding: '8px',
-                    marginBottom: '5px',
-                    background: entry.type === 'credit' ? '#ffebee' : '#e8f5e9',
-                    borderRadius: '5px',
-                    fontSize: '14px',
-                    border: entry.type === 'credit' ? '1px solid #ef9a9a' : '1px solid #a5d6a7'
-                  }}>
-                    <strong>{entry.account}</strong>: {entry.type === 'credit' ? `($${entry.amount.toFixed(2)})` : `+$${entry.amount.toFixed(2)}`}
-                  </div>
-                ))}
+            );
+          } else {
+            // Old journal format with entries array
+            return (
+              <div key={entry.id} style={{
+                marginBottom: '10px',
+                border: '2px solid #e0e0e0',
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  padding: '12px',
+                  background: '#f5f5f5',
+                  fontWeight: 'bold',
+                  fontSize: '12px'
+                }}>
+                  Journal #{entry.id} - {new Date(entry.timestamp).toLocaleString()}
+                </div>
+                <div style={{ padding: '12px', background: 'white' }}>
+                  {entry.entries && entry.entries.map((journalEntry, idx) => (
+                    <div key={idx} style={{
+                      padding: '8px',
+                      marginBottom: '5px',
+                      background: journalEntry.type === 'credit' ? '#ffebee' : '#e8f5e9',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      border: journalEntry.type === 'credit' ? '1px solid #ef9a9a' : '1px solid #a5d6a7'
+                    }}>
+                      <strong>{journalEntry.account}</strong>: {journalEntry.type === 'credit' ? `($${journalEntry.amount.toFixed(2)})` : `+$${journalEntry.amount.toFixed(2)}`}
+                    </div>
+                  ))}
+                </div>
               </div>
-            )}
-          </div>
-        ))
+            );
+          }
+        })
       )}
     </div>
   );
@@ -4773,14 +4964,14 @@ function JournalButton({ onJournalClick, isJournalMode }) {
         zIndex: 1001,
         background: isJournalMode 
           ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)' 
-          : 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
+          : 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
         transition: 'all 0.3s ease',
         backdropFilter: 'blur(10px)',
         border: '3px solid rgba(255,255,255,0.2)'
       }}
     >
-      {isJournalMode ? '🚪 EXIT ENTRY' : '➕ ADD ACCOUNT ENTRY'}
+      {isJournalMode ? '🚪 EXIT JOURNAL MODE' : '📝 JOURNAL MODE'}
     </button>
   );
 }
@@ -5089,23 +5280,28 @@ function Tutorial({ isVisible, onClose, currentStep, onNext, onPrev }) {
   const steps = [
     {
       title: "Welcome to Accounting Garden! 🌳",
-      content: "This is a 3D interactive accounting system. You can manage your financial accounts by clicking on the trees.",
+      content: "This is a 3D interactive accounting system. Manage your financial accounts by clicking on the account buildings and objects in the scene.",
       position: { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }
     },
     {
-      title: "Account Types",
-      content: "Green trees on the left are ASSETS (what you own). Brown trees on the right are LIABILITIES (what you owe).",
+      title: "Understanding the Layout",
+      content: "Look at the ground - GREEN side (left) = ASSETS (what you own like Cash, Bank, Equipment). BROWN side (right) = LIABILITIES (what you owe like Loans, Credit Card Debt).",
       position: { top: '30%', left: '20px' }
     },
     {
-      title: "Creating Journal Entries",
-      content: "Click 'START JOURNAL' to begin recording transactions. Then click on account trees to add debits and credits.",
+      title: "Recording Transactions",
+      content: "Click any account to open the transaction panel. 1st click = DEBIT (green, adds money), 2nd click = CREDIT (red, subtracts money), 3rd click = NONE (no entry), 4th click = Close panel. Enter amount and click Save.",
       position: { top: '20px', right: '20px' }
     },
     {
-      title: "Balancing Your Books",
-      content: "Remember: Total Debits must equal Total Credits. The system will help you balance your entries.",
+      title: "Track Your Transactions",
+      content: "View all transactions in '💼 Transactions' box at bottom left with account names, amounts, and timestamps. Check your Financial Summary (top left) for asset/liability totals and net worth.",
       position: { bottom: '20px', left: '20px' }
+    },
+    {
+      title: "Export & Import Data",
+      content: "Use the Export/Import panel in the top right corner to save your accounting data as JSON or load previously saved data.",
+      position: { top: '20px', right: '20px' }
     }
   ];
 
@@ -5255,6 +5451,7 @@ export default function App() {
   const [cameraPosition, setCameraPosition] = useState([0, 12, 20]);
   const [cameraTarget, setCameraTarget] = useState([0, 0, 0]);
   const rainIntensity = 1;
+  const [accountEntryPanel, setAccountEntryPanel] = useState({ visible: false, account: '', isAsset: false, transactionType: 'debit', clickCount: 0 });
   const [accountBalances, setAccountBalances] = useState({
     // Liability accounts (left side)
     'Credit Card Debt': 0,
@@ -5339,7 +5536,7 @@ export default function App() {
   };
 
   const handleTutorialNext = () => {
-    setTutorialStep(prev => Math.min(prev + 1, 3));
+    setTutorialStep(prev => Math.min(prev + 1, 4));
   };
 
   const handleTutorialPrev = () => {
@@ -5366,6 +5563,56 @@ export default function App() {
 
   const handleCloseDetails = () => {
     setShowDetails({ visible: false, type: null });
+  };
+
+  const handleDirectAccountEntry = (account, isAsset, transactionType, amount) => {
+    if (!account || !amount) return;
+    
+    // Create a transaction entry
+    const transaction = {
+      id: Date.now(),
+      account: account,
+      type: transactionType,
+      amount: amount,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Add transaction to the transactions list
+    setJournalEntries(prev => [transaction, ...prev]);
+    
+    setAccountBalances(prev => {
+      const newBalances = { ...prev };
+      const currentBalance = newBalances[account] || 0;
+      
+      if (transactionType === 'debit') {
+        newBalances[account] = currentBalance + amount;
+      } else {
+        newBalances[account] = currentBalance - amount;
+      }
+      
+      return newBalances;
+    });
+    
+    // Close the panel
+    setAccountEntryPanel({ visible: false, account: '', isAsset: false, transactionType: 'debit' });
+  };
+
+  const handleAccountEntryOpen = (accountName, isAsset, clickCount) => {
+    if (accountName && clickCount > 0) {
+      // Map click count to transaction type: 1=credit, 2=debit, 3=null
+      const transactionType = clickCount === 1 ? 'credit' : clickCount === 2 ? 'debit' : 'none';
+      
+      setAccountEntryPanel({ 
+        visible: true, 
+        account: accountName, 
+        isAsset: isAsset, 
+        transactionType: transactionType,
+        clickCount: clickCount
+      });
+    } else {
+      // Close panel
+      setAccountEntryPanel({ visible: false, account: '', isAsset: false, transactionType: 'debit', clickCount: 0 });
+    }
   };
 
   // Prepare account details data
@@ -5476,6 +5723,7 @@ export default function App() {
           isJournalMode={isJournalMode}
           accountBalances={accountBalances}
           onAccountInfoClick={handleAccountInfoClick}
+          onAccountEntryOpen={handleAccountEntryOpen}
           cameraPosition={cameraPosition}
           cameraTarget={cameraTarget}
           rainIntensity={rainIntensity}
@@ -5531,10 +5779,10 @@ export default function App() {
           <div style={{ 
             width: '20px', 
             height: '20px', 
-            background: '#4a7c3c', 
+            background: '#2e7d32', 
             borderRadius: '4px', 
             marginRight: '10px',
-            border: '1px solid #2d5016'
+            border: '1px solid #1b5e20'
           }} />
           <span style={{ fontSize: '14px', color: '#555' }}>Assets (Left - Green)</span>
         </div>
@@ -5542,19 +5790,17 @@ export default function App() {
           <div style={{ 
             width: '20px', 
             height: '20px', 
-            background: '#cd853f', 
+            background: '#8b4513', 
             borderRadius: '4px', 
             marginRight: '10px',
-            border: '1px solid #8b4513'
+            border: '1px solid #654321'
           }} />
           <span style={{ fontSize: '14px', color: '#555' }}>Liabilities (Right - Brown)</span>
         </div>
         <div style={{ fontSize: '12px', marginTop: '10px', color: '#666', fontStyle: 'italic' }}>
-          💡 Click "START JOURNAL" to begin
+          💡 Click account: 1st=Debit, 2nd=Credit, 3rd=None, 4th=Close
         </div>
       </div>
-      
-      <JournalButton onJournalClick={handleJournalClick} isJournalMode={isJournalMode} />
       
       {/* Help Button */}
       <button
@@ -5588,6 +5834,19 @@ export default function App() {
           onCloseJournal={handleCloseJournal}
           onCompleteJournal={handleCompleteJournal}
           clickCount={clickCounts[selectedAccount] || 0}
+        />
+      )}
+
+      {/* Account Entry Side Panel */}
+      {accountEntryPanel.visible && (
+        <AccountEntrySidePanel
+          account={accountEntryPanel.account}
+          isAsset={accountEntryPanel.isAsset}
+          transactionType={accountEntryPanel.transactionType}
+          clickCount={accountEntryPanel.clickCount}
+          accountBalance={accountBalances[accountEntryPanel.account] || 0}
+          onClose={() => setAccountEntryPanel({ visible: false, account: '', isAsset: false, transactionType: 'debit', clickCount: 0 })}
+          onSave={handleDirectAccountEntry}
         />
       )}
       
