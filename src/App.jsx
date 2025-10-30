@@ -6,12 +6,12 @@ import * as THREE from 'three';
 // LIABILITIES - Right Side (using different objects as containers)
 const liabilityAccounts = [
   { name: 'Credit Card Debt', position: [8, 0, 2], scale: 1.2, type: 'creditcard' },
-  { name: 'Bank Loan', position: [8, 0, -2], scale: 1.5, type: 'document' },
-  { name: 'Accounts Payable', position: [4, 0, -2], scale: 1.8, type: 'invoice' },
-  { name: 'Mortgage', position: [4, 0, 2], scale: 1.8, type: 'house' },
-  { name: 'Tax Payable', position: [6, 0, 0], scale: 1.3, type: 'tax' },
-  { name: 'Accrued Expenses', position: [6, 0, -4], scale: 1.5, type: 'accrued' },
-  { name: 'Short-term Debt', position: [4, 0, 0], scale: 1.6, type: 'iou' },
+  { name: 'Bank Loan', position: [9, 0, -2], scale: 1.5, type: 'document' },
+  { name: 'Accounts Payable', position: [3, 0, -2.5], scale: 1.8, type: 'invoice' },
+  { name: 'Mortgage', position: [3, 0, 3], scale: 1.8, type: 'house' },
+  { name: 'Tax Payable', position: [6, 0, 4], scale: 1.3, type: 'tax' },
+  { name: 'Accrued Expenses', position: [6.5, 0, -4], scale: 1.5, type: 'accrued' },
+  { name: 'Short-term Debt', position: [5.25, 0, 0], scale: 1.6, type: 'iou' },
 ];
 
 // ASSETS - Left Side (using different objects)
@@ -3612,13 +3612,75 @@ function Bush({ position, scale = 1 }) {
 
 
 
+// Grass Blade Component
+function GrassBlade({ position }) {
+  const bladeRef = useRef();
+  const offset = Math.random() * Math.PI * 2;
+  
+  useFrame((state) => {
+    if (bladeRef.current) {
+      const time = state.clock.elapsedTime;
+      bladeRef.current.rotation.z = Math.sin(time * 1.5 + offset) * 0.15;
+    }
+  });
+  
+  return (
+    <group ref={bladeRef} position={position} rotation={[0, Math.random() * Math.PI * 2, 0]}>
+      <mesh position={[0, 0.05, 0]}>
+        <coneGeometry args={[0.01, 0.1, 3]} />
+        <meshStandardMaterial 
+          color="#2e7d32" 
+          roughness={0.8}
+          metalness={0.1}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+// Grass Patch Component
+function GrassPatch({ position, count = 20 }) {
+  const positions = Array.from({ length: count }, () => [
+    (Math.random() - 0.5) * 1,
+    0,
+    (Math.random() - 0.5) * 1
+  ]);
+  
+  return (
+    <group position={position}>
+      {positions.map((pos, i) => (
+        <GrassBlade key={i} position={pos} />
+      ))}
+    </group>
+  );
+}
+
 // Fountain Component
 function Fountain({ position }) {
   const waterRef = useRef();
+  const jetRef = useRef();
+  const particlesRef = useRef();
   
   useFrame((state) => {
+    // Animate water level
     if (waterRef.current) {
       waterRef.current.position.y = 0.4 + Math.sin(state.clock.elapsedTime * 2) * 0.05;
+    }
+    // Animate water jet
+    if (jetRef.current) {
+      const height = 0.5 + Math.sin(state.clock.elapsedTime * 4) * 0.3;
+      jetRef.current.scale.y = height;
+    }
+    // Animate water particles
+    if (particlesRef.current) {
+      const time = state.clock.elapsedTime;
+      particlesRef.current.children.forEach((particle, i) => {
+        const angle = (i / particlesRef.current.children.length) * Math.PI * 2 + time * 2;
+        const radius = 0.2 + Math.sin(time * 2 + i) * 0.05;
+        particle.position.x = Math.cos(angle) * radius;
+        particle.position.y = 0.55 + Math.sin(time * 3 + i) * 0.2;
+        particle.position.z = Math.sin(angle) * radius;
+      });
     }
   });
 
@@ -3634,7 +3696,7 @@ function Fountain({ position }) {
         <cylinderGeometry args={[0.9, 0.8, 0.2, 32]} />
         <meshStandardMaterial color="#d0d0d0" roughness={0.2} metalness={0.3} />
       </mesh>
-      {/* Water */}
+      {/* Water in basin */}
       <mesh ref={waterRef} position={[0, 0.4, 0]}>
         <cylinderGeometry args={[0.85, 0.75, 0.08, 32]} />
         <meshStandardMaterial 
@@ -3645,6 +3707,34 @@ function Fountain({ position }) {
           metalness={0.8}
         />
       </mesh>
+      {/* Water jet stream */}
+      <mesh ref={jetRef} position={[0, 0.5, 0]} rotation={[0, 0, 0]}>
+        <cylinderGeometry args={[0.08, 0.08, 0.5, 16]} />
+        <meshStandardMaterial 
+          color="#26c6da" 
+          transparent 
+          opacity={0.7}
+          roughness={0.05}
+          metalness={0.9}
+          emissive="#87ceeb"
+          emissiveIntensity={0.3}
+        />
+      </mesh>
+      {/* Water particles/droplets */}
+      <group ref={particlesRef}>
+        {Array.from({ length: 12 }).map((_, i) => (
+          <mesh key={i} position={[0, 0.55, 0]}>
+            <sphereGeometry args={[0.02, 8, 8]} />
+            <meshStandardMaterial 
+              color="#00bcd4" 
+              transparent 
+              opacity={0.8}
+              metalness={1}
+              roughness={0.1}
+            />
+          </mesh>
+        ))}
+      </group>
       {/* Center pillar */}
       <mesh position={[0, 0.65, 0]}>
         <cylinderGeometry args={[0.1, 0.12, 0.5, 16]} />
@@ -4010,18 +4100,12 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
         <meshStandardMaterial color="#8b4513" roughness={0.9} />
       </mesh>
 
-      {/* Grid lines for structure */}
-      <gridHelper args={[40, 40, '#888888', '#666666']} position={[0, 0.01, 0]} />
 
       {/* Fog for depth perception
       <fog attach="fog" args={['#87ceeb', 10, 50]} /> */}
 
       {/* Central pathway */}
       <GardenPath position={[0, 0.02, 0]} width={2.5} length={18} />
-
-      {/* Decorative paths */}
-      <GardenPath position={[-6, 0.02, 0]} width={1.5} length={12} />
-      <GardenPath position={[6, 0.02, 0]} width={1.5} length={12} />
 
       {/* ASSET SIDE (Left) - Green/Natural tones */}
       <group>
@@ -4222,6 +4306,16 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
         <RockCluster position={[8, 0, -5]} count={3} />
         <RockCluster position={[-5, 0, -5]} count={3} />
         <RockCluster position={[5, 0, 5]} count={4} />
+        
+        {/* Grass patches */}
+        <GrassPatch position={[-11, 0, 3]} count={15} />
+        <GrassPatch position={[-11, 0, -3]} count={15} />
+        <GrassPatch position={[11, 0, 3]} count={15} />
+        <GrassPatch position={[11, 0, -3]} count={15} />
+        <GrassPatch position={[-1, 0, 7]} count={20} />
+        <GrassPatch position={[1, 0, 7]} count={20} />
+        <GrassPatch position={[-1, 0, -7]} count={20} />
+        <GrassPatch position={[1, 0, -7]} count={20} />
       </group>
 
       <OrbitControls 
@@ -4564,7 +4658,7 @@ function JournalPanel({ currentJournal, onAddEntry, onCloseJournal, onCompleteJo
 }
 
 // Journal Display Component
-function JournalDisplay({ journalEntries }) {
+function JournalDisplay({ journalEntries, collapsed, onToggle }) {
   // Check if entries has 'entries' property (old journal format) or is a direct transaction
   const isTransaction = (entry) => entry.account && entry.type && entry.amount !== undefined;
   
@@ -4574,20 +4668,41 @@ function JournalDisplay({ journalEntries }) {
       bottom: '20px',
       left: '20px',
       background: 'white',
-      padding: '20px',
+      padding: collapsed ? '12px 20px' : '20px',
       borderRadius: '15px',
       boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
       maxWidth: '500px',
-      maxHeight: '400px',
+      maxHeight: collapsed ? '60px' : '400px',
       overflowY: 'auto',
       zIndex: 1000,
-      border: '2px solid #e0e0e0'
+      border: '2px solid #e0e0e0',
+      transition: 'all 0.3s ease'
     }}>
-      <h4 style={{ marginTop: 0, color: '#333' }}>💼 Transactions</h4>
-      {journalEntries.length === 0 ? (
-        <p style={{ color: '#999' }}>No transactions yet</p>
-      ) : (
-        journalEntries.map((entry) => {
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={onToggle}>
+        <h4 style={{ margin: 0, color: '#333', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          💼 Transactions
+          {!collapsed && journalEntries.length > 0 && (
+            <span style={{ fontSize: '12px', color: '#999', fontWeight: 'normal' }}>
+              ({journalEntries.length})
+            </span>
+          )}
+        </h4>
+        <div style={{ 
+          fontSize: '20px', 
+          transition: 'transform 0.3s ease',
+          transform: collapsed ? 'rotate(0deg)' : 'rotate(180deg)',
+          color: '#2196F3'
+        }}>
+          ⬆️
+        </div>
+      </div>
+      
+      {!collapsed && (
+        <div style={{ marginTop: '15px' }}>
+          {journalEntries.length === 0 ? (
+            <p style={{ color: '#999' }}>No transactions yet</p>
+          ) : (
+            journalEntries.map((entry) => {
           // Handle both transaction objects and old journal format
           if (isTransaction(entry)) {
             // It's a direct transaction
@@ -4651,8 +4766,10 @@ function JournalDisplay({ journalEntries }) {
                 </div>
               </div>
             );
-          }
-        })
+            }
+          })
+          )}
+        </div>
       )}
     </div>
   );
@@ -5452,6 +5569,7 @@ export default function App() {
   const [cameraTarget, setCameraTarget] = useState([0, 0, 0]);
   const rainIntensity = 1;
   const [accountEntryPanel, setAccountEntryPanel] = useState({ visible: false, account: '', isAsset: false, transactionType: 'debit', clickCount: 0 });
+  const [transactionsCollapsed, setTransactionsCollapsed] = useState(true);
   const [accountBalances, setAccountBalances] = useState({
     // Liability accounts (left side)
     'Credit Card Debt': 0,
@@ -5845,12 +5963,20 @@ export default function App() {
           transactionType={accountEntryPanel.transactionType}
           clickCount={accountEntryPanel.clickCount}
           accountBalance={accountBalances[accountEntryPanel.account] || 0}
-          onClose={() => setAccountEntryPanel({ visible: false, account: '', isAsset: false, transactionType: 'debit', clickCount: 0 })}
+          onClose={() => {
+            setAccountEntryPanel({ visible: false, account: '', isAsset: false, transactionType: 'debit', clickCount: 0 });
+            setSelectedAccount(null);
+            setClickCounts({});
+          }}
           onSave={handleDirectAccountEntry}
         />
       )}
       
-      <JournalDisplay journalEntries={journalEntries} />
+      <JournalDisplay 
+        journalEntries={journalEntries} 
+        collapsed={transactionsCollapsed}
+        onToggle={() => setTransactionsCollapsed(!transactionsCollapsed)}
+      />
       
       <BalanceDashboard 
         accountBalances={accountBalances} 
