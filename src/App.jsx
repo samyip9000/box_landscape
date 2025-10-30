@@ -4045,7 +4045,7 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
             return <TreeAccount {...commonProps} />;
           }
         })}
-{/* 
+        {/* 
         Decorative background trees */}
         <DecorativeTree position={[-10, 0, 4]} scale={1.3} treeType="pine" />
         <DecorativeTree position={[-10, 0, -4]} scale={1.1} treeType="round" />
