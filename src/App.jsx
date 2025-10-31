@@ -18,8 +18,8 @@ const liabilityAccounts = [
 const equityAccounts = [
   { name: 'Retained Earnings', position: [12, 0, 6.5], scale: 1.3, type: 'stock', theme: 'blue' }, // Stock display for earnings
   { name: 'Prefer', position: [13.5, 0, 9.5], scale: 1.4, type: 'document', theme: 'purple' }, // Legal document for preferred shares
-  { name: 'Capital', position: [4.5, 0, 6.5], scale: 1.5, type: 'bank', theme: 'blue' }, // Bank building for capital
-  { name: 'P&L', position: [9, 0, 11], scale: 1.3, type: 'office', theme: 'teal' }, // Office building for P&L
+  { name: 'P&L', position: [4.5, 0, 6.5], scale: 1.5, type: 'bank', theme: 'blue' }, // Bank building for capital
+  { name: 'Capital', position: [9, 0, 11], scale: 1.3, type: 'office', theme: 'teal' }, // Office building for P&L
   { name: 'Common Stock', position: [9.75, 0, 8], scale: 1.4, type: 'machine', theme: 'cyan' }, // Industrial machine for common stock
 ];
 
@@ -213,7 +213,7 @@ function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount,
       {/* Premium base platform with holographic ring */}
       <group>
         <mesh position={[0, 0.05, 0]} castShadow>
-          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+        <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
           <meshStandardMaterial 
             color="#1e293b" 
             roughness={0.2}
@@ -221,7 +221,7 @@ function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount,
             emissive="#8b5cf6"
             emissiveIntensity={0.2}
           />
-        </mesh>
+      </mesh>
         
         {/* Glowing ring */}
         <mesh position={[0, 0.11, 0]}>
@@ -451,7 +451,7 @@ function LorryAccount({ name, position, scale, onSelect, isSelected, clickCount,
       {/* Premium base platform with holographic ring */}
       <group>
         <mesh position={[0, 0.05, 0]} castShadow>
-          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+        <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
           <meshStandardMaterial 
             color="#1e293b" 
             roughness={0.2}
@@ -459,7 +459,7 @@ function LorryAccount({ name, position, scale, onSelect, isSelected, clickCount,
             emissive="#8b5cf6"
             emissiveIntensity={0.2}
           />
-        </mesh>
+      </mesh>
         
         {/* Glowing ring */}
         <mesh position={[0, 0.11, 0]}>
@@ -4325,8 +4325,8 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
       {/* Ground - color-coded for assets (green left) and liabilities (brown right) */}
       {/* Left side - Premium Asset Ground with Grid */}
       <group>
-        <mesh position={[-10, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[20, 40]} />
+      <mesh position={[-10, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[20, 40]} />
           <meshStandardMaterial 
             color="#1a3d2e" 
             roughness={0.7}
@@ -4334,7 +4334,7 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
             emissive="#10b981"
             emissiveIntensity={0.05}
           />
-        </mesh>
+      </mesh>
         
         {/* Glowing grid lines - Horizontal */}
         {Array.from({ length: 21 }).map((_, i) => (
@@ -4389,8 +4389,8 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
 
       {/* Right side - Premium Liability Ground with Grid */}
       <group>
-        <mesh position={[10, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[20, 40]} />
+      <mesh position={[10, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[20, 40]} />
           <meshStandardMaterial 
             color="#3d2817" 
             roughness={0.7}
@@ -4398,7 +4398,7 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
             emissive="#f59e0b"
             emissiveIntensity={0.05}
           />
-        </mesh>
+      </mesh>
         
         {/* Glowing grid lines - Horizontal */}
         {Array.from({ length: 21 }).map((_, i) => (
@@ -4462,8 +4462,8 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
       <group>
         {/* Account objects */}
         {assetAccounts.map((account, index) => {
+          const itemKey = `asset-${account.name}-${index}`;
           const commonProps = {
-            key: `asset-${account.name}-${index}`,
             name: account.name,
             position: account.position,
             scale: account.scale,
@@ -4476,35 +4476,35 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
           };
 
           if (account.type === 'bank') {
-            return <BankBuilding {...commonProps} />;
+            return <BankBuilding key={itemKey} {...commonProps} />;
           } else if (account.type === 'lorry') {
-            return <LorryAccount {...commonProps} />;
+            return <LorryAccount key={itemKey} {...commonProps} />;
           } else if (account.type === 'safe') {
-            return <SafeVault {...commonProps} />;
+            return <SafeVault key={itemKey} {...commonProps} />;
           } else if (account.type === 'warehouse') {
-            return <WarehouseContainer {...commonProps} />;
+            return <WarehouseContainer key={itemKey} {...commonProps} />;
           } else if (account.type === 'machine') {
-            return <IndustrialMachine {...commonProps} />;
+            return <IndustrialMachine key={itemKey} {...commonProps} />;
           } else if (account.type === 'office') {
-            return <OfficeBuilding {...commonProps} />;
+            return <OfficeBuilding key={itemKey} {...commonProps} />;
           } else if (account.type === 'creditcard') {
-            return <CreditCard {...commonProps} />;
+            return <CreditCard key={itemKey} {...commonProps} />;
           } else if (account.type === 'document') {
-            return <LegalDocument {...commonProps} />;
+            return <LegalDocument key={itemKey} {...commonProps} />;
           } else if (account.type === 'invoice') {
-            return <InvoiceStack {...commonProps} />;
+            return <InvoiceStack key={itemKey} {...commonProps} />;
           } else if (account.type === 'house') {
-            return <MortgageHouse {...commonProps} />;
+            return <MortgageHouse key={itemKey} {...commonProps} />;
           } else if (account.type === 'tax') {
-            return <TaxForm {...commonProps} />;
+            return <TaxForm key={itemKey} {...commonProps} />;
           } else if (account.type === 'accrued') {
-            return <AccruedExpensesCalculator {...commonProps} />;
+            return <AccruedExpensesCalculator key={itemKey} {...commonProps} />;
           } else if (account.type === 'iou') {
-            return <PromissoryNote {...commonProps} />;
+            return <PromissoryNote key={itemKey} {...commonProps} />;
           } else if (account.type === 'stock') {
-            return <StockMarketDisplay {...commonProps} />;
+            return <StockMarketDisplay key={itemKey} {...commonProps} />;
           } else {
-            return <TreeAccount {...commonProps} />;
+            return <TreeAccount key={itemKey} {...commonProps} />;
           }
         })}
         {/* 
@@ -4544,8 +4544,8 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
       <group>
         {/* Account objects */}
         {liabilityAccounts.map((account, index) => {
+          const itemKey = `liability-${account.name}-${index}`;
           const commonProps = {
-            key: `liability-${account.name}-${index}`,
             name: account.name,
             position: account.position,
             scale: account.scale,
@@ -4558,35 +4558,35 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
           };
 
           if (account.type === 'bank') {
-            return <BankBuilding {...commonProps} />;
+            return <BankBuilding key={itemKey} {...commonProps} />;
           } else if (account.type === 'lorry') {
-            return <LorryAccount {...commonProps} />;
+            return <LorryAccount key={itemKey} {...commonProps} />;
           } else if (account.type === 'safe') {
-            return <SafeVault {...commonProps} />;
+            return <SafeVault key={itemKey} {...commonProps} />;
           } else if (account.type === 'warehouse') {
-            return <WarehouseContainer {...commonProps} />;
+            return <WarehouseContainer key={itemKey} {...commonProps} />;
           } else if (account.type === 'machine') {
-            return <IndustrialMachine {...commonProps} />;
+            return <IndustrialMachine key={itemKey} {...commonProps} />;
           } else if (account.type === 'office') {
-            return <OfficeBuilding {...commonProps} />;
+            return <OfficeBuilding key={itemKey} {...commonProps} />;
           } else if (account.type === 'creditcard') {
-            return <CreditCard {...commonProps} />;
+            return <CreditCard key={itemKey} {...commonProps} />;
           } else if (account.type === 'document') {
-            return <LegalDocument {...commonProps} />;
+            return <LegalDocument key={itemKey} {...commonProps} />;
           } else if (account.type === 'invoice') {
-            return <InvoiceStack {...commonProps} />;
+            return <InvoiceStack key={itemKey} {...commonProps} />;
           } else if (account.type === 'house') {
-            return <MortgageHouse {...commonProps} />;
+            return <MortgageHouse key={itemKey} {...commonProps} />;
           } else if (account.type === 'tax') {
-            return <TaxForm {...commonProps} />;
+            return <TaxForm key={itemKey} {...commonProps} />;
           } else if (account.type === 'accrued') {
-            return <AccruedExpensesCalculator {...commonProps} />;
+            return <AccruedExpensesCalculator key={itemKey} {...commonProps} />;
           } else if (account.type === 'iou') {
-            return <PromissoryNote {...commonProps} />;
+            return <PromissoryNote key={itemKey} {...commonProps} />;
           } else if (account.type === 'stock') {
-            return <StockMarketDisplay {...commonProps} />;
+            return <StockMarketDisplay key={itemKey} {...commonProps} />;
           } else {
-            return <TreeAccount {...commonProps} />;
+            return <TreeAccount key={itemKey} {...commonProps} />;
           }
         })}
 
@@ -4623,8 +4623,8 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
       <group>
         {/* Account objects */}
         {equityAccounts.map((account, index) => {
+          const itemKey = `equity-${account.name}-${index}`;
           const commonProps = {
-            key: `equity-${account.name}-${index}`,
             name: account.name,
             position: account.position,
             scale: account.scale,
@@ -4639,24 +4639,24 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
 
           // Map equity accounts to appropriate 3D components
           if (account.type === 'bank') {
-            return <BankBuilding {...commonProps} />;
+            return <BankBuilding key={itemKey} {...commonProps} />;
           } else if (account.type === 'stock') {
-            return <StockMarketDisplay {...commonProps} />;
+            return <StockMarketDisplay key={itemKey} {...commonProps} />;
           } else if (account.type === 'document') {
-            return <LegalDocument {...commonProps} />;
+            return <LegalDocument key={itemKey} {...commonProps} />;
           } else if (account.type === 'office') {
-            return <OfficeBuilding {...commonProps} />;
+            return <OfficeBuilding key={itemKey} {...commonProps} />;
           } else if (account.type === 'machine') {
-            return <IndustrialMachine {...commonProps} />;
+            return <IndustrialMachine key={itemKey} {...commonProps} />;
           } else {
-            return <TreeAccount {...commonProps} />;
+            return <TreeAccount key={itemKey} {...commonProps} />;
           }
         })}
 
         {/* P&L Sub-Accounts (shown when P&L is clicked) */}
         {showPLSubAccounts && (() => {
-          const baseX = -3; // P&L x position (updated: 6 * 1.5)
-          const baseZ = 11; // P&L z position (11 - 7 = 4 from original, but shifted to match new P&L)
+          const baseX = -7; // P&L x position (updated: 6 * 1.5)
+          const baseZ = 8; // P&L z position (11 - 7 = 4 from original, but shifted to match new P&L)
           
           return (
             <group>
@@ -5459,8 +5459,8 @@ function AccountDetailsModal({ isVisible, type, accounts, onClose }) {
                     : 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
                   borderRadius: '16px',
                   border: `2px solid ${account.balance >= 0 ? colors.primary : '#ef4444'}`,
-                  display: 'flex',
-                  justifyContent: 'space-between',
+                display: 'flex',
+                justifyContent: 'space-between',
                   alignItems: 'center',
                   boxShadow: account.balance >= 0 
                     ? `0 4px 16px ${colors.glow}`
@@ -6725,16 +6725,16 @@ export default function App() {
       
       {/* Title/Header - Hidden when P&L sub-accounts are open */}
       {!showPLSubAccounts && (
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
           color: '#fff',
           fontSize: '38px',
           fontWeight: '900',
-          zIndex: 999,
-          textAlign: 'center',
+        zIndex: 999,
+        textAlign: 'center',
           background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%)',
           padding: '20px 50px',
           borderRadius: '24px',
@@ -6761,12 +6761,12 @@ export default function App() {
             backgroundClip: 'text',
             position: 'relative',
             zIndex: 1
-          }}>
-            🌳 Accounting Garden 🌳
+      }}>
+        🌳 Accounting Garden 🌳
           </span>
           
-          <div style={{
-            fontSize: '14px',
+        <div style={{
+          fontSize: '14px',
             fontWeight: '600',
             color: '#94a3b8',
             marginTop: '8px',
@@ -6777,8 +6777,8 @@ export default function App() {
             zIndex: 1
           }}>
             ⚡ Premium Financial Management System ⚡
-          </div>
         </div>
+      </div>
       )}
 
       {/* Legend */}
