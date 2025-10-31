@@ -5,23 +5,42 @@ import * as THREE from 'three';
 
 // LIABILITIES - Right Side (using different objects as containers)
 const liabilityAccounts = [
-  { name: 'Credit Card Debt', position: [8, 0, 2], scale: 1.2, type: 'creditcard' },
-  { name: 'Bank Loan', position: [9, 0, -2], scale: 1.5, type: 'document' },
-  { name: 'Accounts Payable', position: [3, 0, -2.5], scale: 1.8, type: 'invoice' },
-  { name: 'Mortgage', position: [3, 0, 3], scale: 1.8, type: 'house' },
-  { name: 'Tax Payable', position: [6, 0, 4], scale: 1.3, type: 'tax' },
-  { name: 'Accrued Expenses', position: [6.5, 0, -4], scale: 1.5, type: 'accrued' },
-  { name: 'Short-term Debt', position: [5.25, 0, 0], scale: 1.6, type: 'iou' },
+  { name: 'Credit Card Debt', position: [12, 0, -4], scale: 1.2, type: 'creditcard' },
+  { name: 'B', position: [13.5, 0, -10], scale: 1.5, type: 'document' },
+  { name: 'Accounts Payable', position: [4.5, 0, -10.75], scale: 1.8, type: 'invoice' },
+  { name: 'Mortgage', position: [4.5, 0, -2.5], scale: 1.8, type: 'house' },
+  { name: 'Tax Payable', position: [9, 0, -1], scale: 1.3, type: 'tax' },
+  { name: 'Accrued Expenses', position: [9.75, 0, -13], scale: 1.5, type: 'accrued' },
+  { name: 'Short-term Debt', position: [7.875, 0, -7], scale: 1.6, type: 'iou' },
+];
+
+// EQUITY - Right Side, in front of liabilities (z > 8)
+const equityAccounts = [
+  { name: 'Retained Earnings', position: [12, 0, 6.5], scale: 1.3, type: 'stock', theme: 'blue' }, // Stock display for earnings
+  { name: 'Prefer', position: [13.5, 0, 9.5], scale: 1.4, type: 'document', theme: 'purple' }, // Legal document for preferred shares
+  { name: 'Capital', position: [4.5, 0, 6.5], scale: 1.5, type: 'bank', theme: 'blue' }, // Bank building for capital
+  { name: 'P&L', position: [9, 0, 11], scale: 1.3, type: 'office', theme: 'teal' }, // Office building for P&L
+  { name: 'Common Stock', position: [9.75, 0, 8], scale: 1.4, type: 'machine', theme: 'cyan' }, // Industrial machine for common stock
+];
+
+// P&L Sub-accounts (shown vertically when P&L is clicked)
+const plSubAccounts = [
+  { name: 'Revenue', type: 'box' },
+  { name: 'Expenses', type: 'box' },
+  { name: 'Cost of Goods', type: 'box' },
+  { name: 'Operating Income', type: 'box' },
+  { name: 'Net Income', type: 'box' },
+  { name: 'Other Income', type: 'box' },
 ];
 
 // ASSETS - Left Side (using different objects)
 const assetAccounts = [
-  { name: 'Cash Account', position: [-4, 0, 4], scale: 1.4, type: 'safe', rotation: -Math.PI / 2 },
-  { name: 'HSBC Bank', position: [-8, 0, 2], scale: 1.6, type: 'bank' },
-  { name: 'Inventory', position: [-8, 0, -2], scale: 1.2, type: 'warehouse' },
-  { name: 'Equipment', position: [-6, 0, 0], scale: 1.5, type: 'machine' },
-  { name: 'Real Estate', position: [-4, 0, 2], scale: 1.8, type: 'office' },
-  { name: 'Investments', position: [-4, 0, -2], scale: 1.3, type: 'stock' },
+  { name: 'Cash Account', position: [-6, 0, -1], scale: 1.4, type: 'safe', rotation: -Math.PI / 2 },
+  { name: 'HSBC Bank', position: [-12, 0, -4], scale: 1.6, type: 'bank' },
+  { name: 'Inventory', position: [-12, 0, -10], scale: 1.2, type: 'warehouse' },
+  { name: 'Equipment', position: [-9, 0, -7], scale: 1.5, type: 'machine' },
+  { name: 'Real Estate', position: [-6, 0, -4], scale: 1.8, type: 'office' },
+  { name: 'Investments', position: [-6, 0, -10], scale: 1.3, type: 'stock' },
 ];
 
 // Rain System Component
@@ -149,10 +168,20 @@ function useFloatingAnimation(speed = 1, amplitude = 0.1) {
 }
 
 // HSBC Bank Building Component
-function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0, rotation = 0 }) {
+function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0, rotation = 0, theme = 'red' }) {
   const groupRef = useRef();
   const floatingRef = useFloatingAnimation(0.8, 0.05);
   const [hovered, setHovered] = useState(false);
+
+  // Define color themes
+  const themes = {
+    red: { main: '#e60000', hover: '#c41e3a', logo: '#ffffff', accent: '#ffd700' },
+    blue: { main: '#0066cc', hover: '#0052a3', logo: '#ffffff', accent: '#00ccff' },
+    green: { main: '#009900', hover: '#007700', logo: '#ffffff', accent: '#66ff66' },
+    purple: { main: '#6633cc', hover: '#5522aa', logo: '#ffffff', accent: '#9966ff' }
+  };
+  
+  const colors = themes[theme] || themes.red;
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -169,7 +198,7 @@ function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount,
     }
   });
 
-  const selectedColor = isSelected ? (clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b') : '#e60000';
+  const selectedColor = isSelected ? (clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b') : colors.main;
 
   return (
     <group 
@@ -181,11 +210,54 @@ function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount,
       onPointerOut={() => setHovered(false)}
     >
       <group ref={floatingRef}>
-      {/* Base platform */}
-      <mesh position={[0, 0.05, 0]}>
-        <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
-        <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
-      </mesh>
+      {/* Premium base platform with holographic ring */}
+      <group>
+        <mesh position={[0, 0.05, 0]} castShadow>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial 
+            color="#1e293b" 
+            roughness={0.2}
+            metalness={0.8}
+            emissive="#8b5cf6"
+            emissiveIntensity={0.2}
+          />
+        </mesh>
+        
+        {/* Glowing ring */}
+        <mesh position={[0, 0.11, 0]}>
+          <torusGeometry args={[0.85, 0.02, 16, 32]} />
+          <meshStandardMaterial 
+            color="#8b5cf6" 
+            emissive="#8b5cf6"
+            emissiveIntensity={1}
+            transparent
+            opacity={0.8}
+          />
+        </mesh>
+        
+        {/* Holographic particles */}
+        {Array.from({ length: 8 }).map((_, i) => {
+          const angle = (i / 8) * Math.PI * 2;
+          return (
+            <mesh 
+              key={i}
+              position={[
+                Math.cos(angle) * 0.9,
+                0.12,
+                Math.sin(angle) * 0.9
+              ]}
+            >
+              <sphereGeometry args={[0.02, 8, 8]} />
+              <meshStandardMaterial 
+                color="#8b5cf6"
+                emissive="#8b5cf6"
+                emissiveIntensity={2}
+              />
+              <pointLight intensity={0.5} distance={1} color="#8b5cf6" />
+            </mesh>
+          );
+        })}
+      </group>
 
       {/* Building foundation */}
       <mesh position={[0, 0.2, 0]} castShadow>
@@ -196,23 +268,23 @@ function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount,
       {/* Main building body - taller and wider */}
       <mesh position={[0, 1.0, 0]} castShadow>
         <boxGeometry args={[0.65, 1.8, 0.6]} />
-        <meshStandardMaterial color={hovered ? '#c41e3a' : '#e60000'} roughness={0.3} metalness={0.4} />
+        <meshStandardMaterial color={hovered ? colors.hover : colors.main} roughness={0.3} metalness={0.4} />
       </mesh>
 
-      {/* HSBC logo red and white stripes - improved pattern */}
+      {/* Logo stripes */}
       <mesh position={[0, 1.8, 0.31]}>
         <boxGeometry args={[0.55, 0.35, 0.02]} />
-        <meshStandardMaterial color="#ffffff" roughness={0.1} metalness={0.9} emissive="#ffffff" emissiveIntensity={isSelected ? 0.3 : 0.1} />
+        <meshStandardMaterial color={colors.logo} roughness={0.1} metalness={0.9} emissive={colors.logo} emissiveIntensity={isSelected ? 0.3 : 0.1} />
       </mesh>
       <mesh position={[0, 1.2, 0.31]}>
         <boxGeometry args={[0.55, 0.35, 0.02]} />
-        <meshStandardMaterial color="#ffffff" roughness={0.1} metalness={0.9} emissive="#ffffff" emissiveIntensity={isSelected ? 0.3 : 0.1} />
+        <meshStandardMaterial color={colors.logo} roughness={0.1} metalness={0.9} emissive={colors.logo} emissiveIntensity={isSelected ? 0.3 : 0.1} />
       </mesh>
 
-      {/* HSBC letters on logo */}
+      {/* Logo text/accent */}
       <mesh position={[0, 1.5, 0.32]}>
         <boxGeometry args={[0.4, 0.08, 0.003]} />
-        <meshStandardMaterial color="#e60000" roughness={0.8} />
+        <meshStandardMaterial color={colors.main} roughness={0.8} />
       </mesh>
 
       {/* Window grid pattern - modern glass effect */}
@@ -260,8 +332,8 @@ function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount,
       ].map((pos, i) => (
         <mesh key={i} position={pos}>
           <sphereGeometry args={[0.03, 16, 16]} />
-          <meshStandardMaterial color="#ffd700" emissive="#ffd700" emissiveIntensity={isSelected ? 1 : 0.5} />
-          {isSelected && <pointLight intensity={0.3} distance={2} color="#ffd700" />}
+          <meshStandardMaterial color={colors.accent} emissive={colors.accent} emissiveIntensity={isSelected ? 1 : 0.5} />
+          {isSelected && <pointLight intensity={0.3} distance={2} color={colors.accent} />}
         </mesh>
       ))}
 
@@ -269,7 +341,7 @@ function BankBuilding({ name, position, scale, onSelect, isSelected, clickCount,
       {[-0.325, 0.325].map((x, i) => (
         <mesh key={i} position={[x, 1.0, 0.305]} castShadow>
           <boxGeometry args={[0.05, 1.8, 0.02]} />
-          <meshStandardMaterial color="#8b0000" roughness={0.3} metalness={0.5} />
+          <meshStandardMaterial color={colors.hover} roughness={0.3} metalness={0.5} />
         </mesh>
       ))}
 
@@ -376,11 +448,54 @@ function LorryAccount({ name, position, scale, onSelect, isSelected, clickCount,
       onPointerOut={() => setHovered(false)}
     >
       <group ref={floatingRef}>
-      {/* Base platform */}
-      <mesh position={[0, 0.05, 0]}>
-        <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
-        <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
-      </mesh>
+      {/* Premium base platform with holographic ring */}
+      <group>
+        <mesh position={[0, 0.05, 0]} castShadow>
+          <cylinderGeometry args={[0.8, 0.9, 0.1, 32]} />
+          <meshStandardMaterial 
+            color="#1e293b" 
+            roughness={0.2}
+            metalness={0.8}
+            emissive="#8b5cf6"
+            emissiveIntensity={0.2}
+          />
+        </mesh>
+        
+        {/* Glowing ring */}
+        <mesh position={[0, 0.11, 0]}>
+          <torusGeometry args={[0.85, 0.02, 16, 32]} />
+          <meshStandardMaterial 
+            color="#8b5cf6" 
+            emissive="#8b5cf6"
+            emissiveIntensity={1}
+            transparent
+            opacity={0.8}
+          />
+        </mesh>
+        
+        {/* Holographic particles */}
+        {Array.from({ length: 8 }).map((_, i) => {
+          const angle = (i / 8) * Math.PI * 2;
+          return (
+            <mesh 
+              key={i}
+              position={[
+                Math.cos(angle) * 0.9,
+                0.12,
+                Math.sin(angle) * 0.9
+              ]}
+            >
+              <sphereGeometry args={[0.02, 8, 8]} />
+              <meshStandardMaterial 
+                color="#8b5cf6"
+                emissive="#8b5cf6"
+                emissiveIntensity={2}
+              />
+              <pointLight intensity={0.5} distance={1} color="#8b5cf6" />
+            </mesh>
+          );
+        })}
+      </group>
 
       {/* Lorry cab */}
       <mesh position={[-0.15, 0.5, 0]}>
@@ -868,12 +983,22 @@ function WarehouseContainer({ name, position, scale, onSelect, isSelected, click
 }
 
 // Industrial Machine Component
-function IndustrialMachine({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+function IndustrialMachine({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0, theme = 'default' }) {
   const groupRef = useRef();
   const floatingRef = useFloatingAnimation(0.8, 0.05);
   const [hovered, setHovered] = useState(false);
   const gearRef1 = useRef();
   const gearRef2 = useRef();
+  
+  // Define color themes
+  const themes = {
+    default: { main: '#2d3748', hover: '#4a5568', accent: '#f59e0b' },
+    orange: { main: '#dc2626', hover: '#ef4444', accent: '#fbbf24' },
+    cyan: { main: '#0891b2', hover: '#06b6d4', accent: '#67e8f9' },
+    lime: { main: '#65a30d', hover: '#84cc16', accent: '#bef264' }
+  };
+  
+  const colors = themes[theme] || themes.default;
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -926,7 +1051,7 @@ function IndustrialMachine({ name, position, scale, onSelect, isSelected, clickC
         <mesh position={[0, 0.7, 0]} castShadow>
           <boxGeometry args={[0.8, 0.8, 0.6]} />
           <meshStandardMaterial 
-            color={hovered ? "#3a7ca5" : "#2c5f8d"}
+            color={hovered ? colors.hover : colors.main}
             roughness={0.4}
             metalness={0.7}
           />
@@ -1149,10 +1274,20 @@ function IndustrialMachine({ name, position, scale, onSelect, isSelected, clickC
 }
 
 // Office Building Component
-function OfficeBuilding({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
+function OfficeBuilding({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0, theme = 'default' }) {
   const groupRef = useRef();
   const floatingRef = useFloatingAnimation(0.8, 0.05);
   const [hovered, setHovered] = useState(false);
+  
+  // Define color themes
+  const themes = {
+    default: { main: '#2d3748', hover: '#4a5568', accent: '#4299e1' },
+    blue: { main: '#1e40af', hover: '#3b82f6', accent: '#60a5fa' },
+    teal: { main: '#0d9488', hover: '#14b8a6', accent: '#5eead4' },
+    orange: { main: '#ea580c', hover: '#f97316', accent: '#fb923c' }
+  };
+  
+  const colors = themes[theme] || themes.default;
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -1197,7 +1332,7 @@ function OfficeBuilding({ name, position, scale, onSelect, isSelected, clickCoun
         <mesh position={[0, 1.0, 0]} castShadow>
           <boxGeometry args={[0.7, 1.5, 0.6]} />
           <meshStandardMaterial 
-            color={hovered ? "#5a6f8a" : "#4a5f7a"}
+            color={hovered ? colors.hover : colors.main}
             roughness={0.3}
             metalness={0.5}
           />
@@ -3363,6 +3498,99 @@ function StockMarketDisplay({ name, position, scale, onSelect, isSelected, click
   );
 }
 
+// P&L Sub-Account Box Component
+function PLSubAccountBox({ name, position, scale, onSelect, isSelected, clickCount, balance = 0 }) {
+  const groupRef = useRef();
+  const floatingRef = useFloatingAnimation(0.8, 0.05);
+  const [hovered, setHovered] = useState(false);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      if (isSelected) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      } else if (hovered) {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale * 1.1, scale * 1.1, scale * 1.1), 0.1);
+      } else {
+        groupRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+        groupRef.current.rotation.y = 0;
+      }
+    }
+  });
+
+  const selectedColor = isSelected ? (clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b') : '#14b8a6';
+
+  return (
+    <group 
+      ref={groupRef} 
+      position={position}
+      onClick={onSelect}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <group ref={floatingRef}>
+        {/* Base platform */}
+        <mesh position={[0, 0.05, 0]}>
+          <cylinderGeometry args={[0.6, 0.7, 0.1, 32]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.1} />
+        </mesh>
+
+        {/* Main box body */}
+        <mesh position={[0, 0.5, 0]} castShadow>
+          <boxGeometry args={[0.8, 0.8, 0.8]} />
+          <meshStandardMaterial 
+            color={hovered ? '#0d9488' : '#14b8a6'} 
+            roughness={0.3} 
+            metalness={0.5}
+            emissive={isSelected ? selectedColor : '#000000'}
+            emissiveIntensity={isSelected ? 0.3 : 0}
+          />
+        </mesh>
+
+        {/* Selection indicator */}
+        {isSelected && (
+          <>
+            <mesh position={[0, 0.02, 0]}>
+              <cylinderGeometry args={[1.0, 1.1, 0.08, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissiveIntensity={0.8}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[1.2, 1.2, 0.02, 32]} />
+              <meshStandardMaterial 
+                color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissive={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.6}
+              />
+            </mesh>
+          </>
+        )}
+
+        <RippleEffect 
+          position={[0, 0.01, 0]} 
+          visible={isSelected && clickCount > 0}
+          color={clickCount === 2 ? '#4caf50' : clickCount === 1 ? '#f44336' : '#9b9b9b'}
+        />
+
+        <Text position={[0, 1.1, 0]} fontSize={0.25} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.03} outlineColor="#000000">
+          {name}
+        </Text>
+
+        {isSelected && (
+          <Text position={[0, -0.3, 0]} fontSize={0.2} color="#ffffff" anchorX="center" anchorY="middle" outlineWidth={0.02} outlineColor="#000000" fontWeight="bold">
+            {clickCount === 1 ? 'DEBIT' : clickCount === 2 ? 'CREDIT' : clickCount === 3 ? 'NONE' : ''}
+          </Text>
+        )}
+      </group>
+    </group>
+  );
+}
+
 // Stylized Tree Component (replacing boxes)
 function TreeAccount({ name, position, scale, onSelect, isSelected, clickCount, isAsset, balance = 0 }) {
   const groupRef = useRef();
@@ -3977,8 +4205,14 @@ function CameraController({ position, target }) {
 }
 
 // Main Scene Component
-function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCounts, isJournalMode, accountBalances, onAccountInfoClick, onAccountEntryOpen, cameraPosition, cameraTarget, rainIntensity }) {
+function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCounts, isJournalMode, accountBalances, onAccountInfoClick, onAccountEntryOpen, cameraPosition, cameraTarget, rainIntensity, showPLSubAccounts, setShowPLSubAccounts }) {
   const handleTreeClick = (accountName, isAsset) => {
+    // Special handling for P&L account
+    if (accountName === 'P&L') {
+      setShowPLSubAccounts(prev => !prev);
+      return;
+    }
+    
     const currentCount = clickCounts[accountName] || 0;
     
     if (currentCount === 0) {
@@ -3986,7 +4220,7 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
       setClickCounts(prev => {
         const newCounts = {};
         // Reset all other accounts
-        [...assetAccounts, ...liabilityAccounts].forEach(acc => {
+        [...assetAccounts, ...liabilityAccounts, ...equityAccounts].forEach(acc => {
           if (acc.name !== accountName) {
             newCounts[acc.name] = 0;
           }
@@ -4017,7 +4251,7 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
       setClickCounts(prev => {
         const newCounts = {};
         // Reset all other accounts
-        [...assetAccounts, ...liabilityAccounts].forEach(acc => {
+        [...assetAccounts, ...liabilityAccounts, ...equityAccounts].forEach(acc => {
           if (acc.name !== accountName) {
             newCounts[acc.name] = 0;
           }
@@ -4039,11 +4273,11 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
       {/* Atmospheric Effects */}
       <Sky 
         distance={450000}
-        sunPosition={[0, 1, 0]}
-        inclination={0.49}
-        azimuth={0.25}
-        turbidity={10}
-        rayleigh={0.5}
+        sunPosition={[100, 20, 100]}
+        inclination={0.6}
+        azimuth={0.15}
+        turbidity={8}
+        rayleigh={2}
         mieCoefficient={0.005}
         mieDirectionalG={0.8}
       />
@@ -4089,16 +4323,133 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
       <pointLight position={[15, 5, 0]} intensity={0.2} color="#f0e68c" distance={25} />
       
       {/* Ground - color-coded for assets (green left) and liabilities (brown right) */}
-      {/* Left side - Green for Assets */}
-      <mesh position={[-10, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[20, 40]} />
-        <meshStandardMaterial color="#2e7d32" roughness={0.9} />
-      </mesh>
-      {/* Right side - Brown for Liabilities */}
-      <mesh position={[10, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[20, 40]} />
-        <meshStandardMaterial color="#8b4513" roughness={0.9} />
-      </mesh>
+      {/* Left side - Premium Asset Ground with Grid */}
+      <group>
+        <mesh position={[-10, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+          <planeGeometry args={[20, 40]} />
+          <meshStandardMaterial 
+            color="#1a3d2e" 
+            roughness={0.7}
+            metalness={0.3}
+            emissive="#10b981"
+            emissiveIntensity={0.05}
+          />
+        </mesh>
+        
+        {/* Glowing grid lines - Horizontal */}
+        {Array.from({ length: 21 }).map((_, i) => (
+          <mesh key={`h-${i}`} position={[-10, 0.01, -20 + i * 2]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[20, 0.03]} />
+            <meshStandardMaterial 
+              color="#10b981" 
+              transparent
+              opacity={0.3}
+              emissive="#10b981"
+              emissiveIntensity={0.5}
+            />
+          </mesh>
+        ))}
+        
+        {/* Glowing grid lines - Vertical */}
+        {Array.from({ length: 11 }).map((_, i) => (
+          <mesh key={`v-${i}`} position={[-20 + i * 2, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[0.03, 40]} />
+            <meshStandardMaterial 
+              color="#10b981" 
+              transparent
+              opacity={0.3}
+              emissive="#10b981"
+              emissiveIntensity={0.5}
+            />
+          </mesh>
+        ))}
+        
+        {/* Ambient light points on ground */}
+        {Array.from({ length: 15 }).map((_, i) => {
+          // Using a seed-based pattern for stable positions
+          const seed = i * 0.618; // Golden ratio for distribution
+          const xOffset = (Math.sin(seed * 10) * 9);
+          const zOffset = (Math.cos(seed * 7) * 20);
+          return (
+            <pointLight 
+              key={`light-a-${i}`}
+              position={[
+                -10 + xOffset,
+                0.5,
+                -20 + 20 + zOffset
+              ]}
+              intensity={0.3}
+              distance={5}
+              color="#10b981"
+              decay={2}
+            />
+          );
+        })}
+      </group>
+
+      {/* Right side - Premium Liability Ground with Grid */}
+      <group>
+        <mesh position={[10, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+          <planeGeometry args={[20, 40]} />
+          <meshStandardMaterial 
+            color="#3d2817" 
+            roughness={0.7}
+            metalness={0.3}
+            emissive="#f59e0b"
+            emissiveIntensity={0.05}
+          />
+        </mesh>
+        
+        {/* Glowing grid lines - Horizontal */}
+        {Array.from({ length: 21 }).map((_, i) => (
+          <mesh key={`h-l-${i}`} position={[10, 0.01, -20 + i * 2]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[20, 0.03]} />
+            <meshStandardMaterial 
+              color="#f59e0b" 
+              transparent
+              opacity={0.3}
+              emissive="#f59e0b"
+              emissiveIntensity={0.5}
+            />
+          </mesh>
+        ))}
+        
+        {/* Glowing grid lines - Vertical */}
+        {Array.from({ length: 11 }).map((_, i) => (
+          <mesh key={`v-l-${i}`} position={[0 + i * 2, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[0.03, 40]} />
+            <meshStandardMaterial 
+              color="#f59e0b" 
+              transparent
+              opacity={0.3}
+              emissive="#f59e0b"
+              emissiveIntensity={0.5}
+            />
+          </mesh>
+        ))}
+        
+        {/* Ambient light points on ground */}
+        {Array.from({ length: 15 }).map((_, i) => {
+          // Using a seed-based pattern for stable positions
+          const seed = i * 0.723; // Different seed for variation
+          const xOffset = (Math.sin(seed * 10) * 9);
+          const zOffset = (Math.cos(seed * 7) * 20);
+          return (
+            <pointLight 
+              key={`light-l-${i}`}
+              position={[
+                10 + xOffset,
+                0.5,
+                -20 + 20 + zOffset
+              ]}
+              intensity={0.3}
+              distance={5}
+              color="#f59e0b"
+              decay={2}
+            />
+          );
+        })}
+      </group>
 
 
       {/* Fog for depth perception
@@ -4158,35 +4509,35 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
         })}
         {/* 
         Decorative background trees */}
-        <DecorativeTree position={[-10, 0, 4]} scale={1.3} treeType="pine" />
-        <DecorativeTree position={[-10, 0, -4]} scale={1.1} treeType="round" />
-        <DecorativeTree position={[-2, 0, -5]} scale={0.9} treeType="pine" />
-        <DecorativeTree position={[-2, 0, 5]} scale={1.0} treeType="round" />
-        <DecorativeTree position={[-9, 0, 0]} scale={0.8} treeType="pine" />
+        <DecorativeTree position={[-15, 0, -1]} scale={1.3} treeType="pine" />
+        <DecorativeTree position={[-15, 0, -13]} scale={1.1} treeType="round" />
+        <DecorativeTree position={[-3, 0, -14.5]} scale={0.9} treeType="pine" />
+        <DecorativeTree position={[-3, 0, 0.5]} scale={1.0} treeType="round" />
+        <DecorativeTree position={[-13.5, 0, -7]} scale={0.8} treeType="pine" />
         
         {/* Bushes */}
-        <Bush position={[-3, 0, 3]} scale={0.9} />
-        <Bush position={[-7, 0, -3]} scale={0.7} />
-        <Bush position={[-5, 0, 5]} scale={0.6} />
-        <Bush position={[-9, 0, 1]} scale={0.8} />
+        <Bush position={[-4.5, 0, -2.5]} scale={0.9} />
+        <Bush position={[-10.5, 0, -11.5]} scale={0.7} />
+        <Bush position={[-7.5, 0, 0.5]} scale={0.6} />
+        <Bush position={[-13.5, 0, -5.5]} scale={0.8} />
 
         {/* Flower beds */}
-        <FlowerBed position={[-5, 0, -4]} width={2} depth={0.5} />
-        <FlowerBed position={[-8, 0, 4]} width={1.8} depth={0.5} />
-        <FlowerBed position={[-3, 0, 0]} width={1.5} depth={0.4} />
+        <FlowerBed position={[-7.5, 0, -13]} width={3} depth={0.75} />
+        <FlowerBed position={[-12, 0, -1]} width={2.7} depth={0.75} />
+        <FlowerBed position={[-4.5, 0, -7]} width={2.25} depth={0.6} />
 
          {/* Railings */}
-         <Railing position={[-11, 0, 0]} width={10} orientation="vertical" />
-         <Railing position={[-6, 0, 6]} width={10} orientation="horizontal" />
-         <Railing position={[-6, 0, -6]} width={10} orientation="horizontal" />
+         <Railing position={[-16.5, 0, -7]} width={15} orientation="vertical" />
+         <Railing position={[-9, 0, 2]} width={15} orientation="horizontal" />
+         <Railing position={[-9, 0, -16]} width={15} orientation="horizontal" />
          
          {/* Advanced Decorative Elements */}
-        <Fountain position={[-12, 0, 0]} />
-        <Bench position={[-9, 0, -3]} rotation={-Math.PI/4} />
-        <LampPost position={[-7, 0, 5]} />
-        <Topiary position={[-5, 0, -1]} shape="sphere" />
-        <RockCluster position={[-3, 0, 2]} count={3} />
-        <SteppingStones startPos={[-2, 0]} endPos={[-8, 0]} count={5} />
+        <Fountain position={[-18, 0, -7]} />
+        <Bench position={[-13.5, 0, -11.5]} rotation={-Math.PI/4} />
+        <LampPost position={[-10.5, 0, 0.5]} />
+        <Topiary position={[-7.5, 0, -8.5]} shape="sphere" />
+        <RockCluster position={[-4.5, 0, -4]} count={3} />
+        <SteppingStones startPos={[-3, -7]} endPos={[-12, -7]} count={5} />
        </group>
 
       {/* LIABILITY SIDE (Right) - Brown/Earth tones */}
@@ -4240,82 +4591,188 @@ function Scene({ selectedAccount, setSelectedAccount, clickCounts, setClickCount
         })}
 
         {/* Decorative background trees */}
-        <DecorativeTree position={[10, 0, 4]} scale={1.2} treeType="round" />
-        <DecorativeTree position={[10, 0, -4]} scale={1.0} treeType="pine" />
-        <DecorativeTree position={[2, 0, -5]} scale={0.8} treeType="pine" />
-        <DecorativeTree position={[2, 0, 4]} scale={0.9} treeType="round" />
+        <DecorativeTree position={[15, 0, -1]} scale={1.2} treeType="round" />
+        <DecorativeTree position={[15, 0, -13]} scale={1.0} treeType="pine" />
+        <DecorativeTree position={[3, 0, -14.5]} scale={0.8} treeType="pine" />
+        <DecorativeTree position={[3, 0, -1]} scale={0.9} treeType="round" />
         
         {/* Bushes */}
-        <Bush position={[9, 0, 0]} scale={0.8} />
-        <Bush position={[3, 0, -3]} scale={0.6} />
-        <Bush position={[5, 0, 5]} scale={0.7} />
+        <Bush position={[13.5, 0, -7]} scale={0.8} />
+        <Bush position={[4.5, 0, -11.5]} scale={0.6} />
+        <Bush position={[7.5, 0, 0.5]} scale={0.7} />
 
         {/* Flower beds */}
-        <FlowerBed position={[8, 0, 0]} width={1.5} depth={0.4} />
-        <FlowerBed position={[4, 0, -4]} width={1.2} depth={0.4} />
+        <FlowerBed position={[12, 0, -7]} width={2.25} depth={0.6} />
+        <FlowerBed position={[6, 0, -13]} width={1.8} depth={0.6} />
 
         {/* Railings */}
-        <Railing position={[11, 0, 0]} width={10} orientation="vertical" />
-        <Railing position={[6, 0, 6]} width={10} orientation="horizontal" />
-        <Railing position={[6, 0, -6]} width={10} orientation="horizontal" />
+        <Railing position={[16.5, 0, -7]} width={15} orientation="vertical" />
+        <Railing position={[9, 0, 2]} width={15} orientation="horizontal" />
+        <Railing position={[9, 0, -16]} width={15} orientation="horizontal" />
         
         {/* Advanced Decorative Elements */}
 
-         <Bench position={[9, 0, 3]} rotation={Math.PI/4} />
-         <LampPost position={[7, 0, -5]} />
-         <Topiary position={[5, 0, 1]} shape="cone" />
-         <RockCluster position={[3, 0, -2]} count={4} />
-         <SteppingStones startPos={[8, 0]} endPos={[2, 0]} count={6} />
+         <Bench position={[13.5, 0, -2.5]} rotation={Math.PI/4} />
+         <LampPost position={[10.5, 0, -14.5]} />
+         <Topiary position={[7.5, 0, -5.5]} shape="cone" />
+         <RockCluster position={[4.5, 0, -10]} count={4} />
+         <SteppingStones startPos={[12, -7]} endPos={[3, -7]} count={6} />
+      </group>
+
+      {/* EQUITY SIDE (Right, z > 8) - In front of liabilities */}
+      <group>
+        {/* Account objects */}
+        {equityAccounts.map((account, index) => {
+          const commonProps = {
+            key: `equity-${account.name}-${index}`,
+            name: account.name,
+            position: account.position,
+            scale: account.scale,
+            rotation: account.rotation || 0,
+            onSelect: () => handleTreeClick(account.name, false),
+            isSelected: selectedAccount === account.name,
+            clickCount: clickCounts[account.name] || 0,
+            isAsset: false,
+            balance: accountBalances[account.name] || 0,
+            theme: account.theme || 'default'
+          };
+
+          // Map equity accounts to appropriate 3D components
+          if (account.type === 'bank') {
+            return <BankBuilding {...commonProps} />;
+          } else if (account.type === 'stock') {
+            return <StockMarketDisplay {...commonProps} />;
+          } else if (account.type === 'document') {
+            return <LegalDocument {...commonProps} />;
+          } else if (account.type === 'office') {
+            return <OfficeBuilding {...commonProps} />;
+          } else if (account.type === 'machine') {
+            return <IndustrialMachine {...commonProps} />;
+          } else {
+            return <TreeAccount {...commonProps} />;
+          }
+        })}
+
+        {/* P&L Sub-Accounts (shown when P&L is clicked) */}
+        {showPLSubAccounts && (() => {
+          const baseX = -3; // P&L x position (updated: 6 * 1.5)
+          const baseZ = 11; // P&L z position (11 - 7 = 4 from original, but shifted to match new P&L)
+          
+          return (
+            <group>
+              {/* White background panel behind the boxes */}
+              <mesh position={[baseX + 7.5, 4, baseZ - 0.6]} rotation={[0, 0, 0]}>
+                <boxGeometry args={[6, 8, 0.05]} />
+                <meshStandardMaterial 
+                  color="#922117" 
+                  roughness={0.2} 
+                  metalness={0.1}
+                  transparent
+                  opacity={0.9}
+                />
+              </mesh>
+              
+              {plSubAccounts.map((subAccount, index) => {
+              
+              // Create two lines: first 3 boxes, last 3 boxes
+              // First line (indices 0-2): y = 1, 4, 7 (keep same)
+              // Second line (indices 3-5): y = 1, 4, 7 but with increased x offset
+              const isSecondLine = index >= 3;
+              const lineIndex = isSecondLine ? index - 3 : index;
+              const yPositions = [1, 4, 7]; // Fixed y positions for each line (unchanged)
+              const yOffset = yPositions[lineIndex];
+              const xOffset = isSecondLine ? 9 : 6; // Second line further to the right (multiplied by 1.5)
+              
+              return (
+                <PLSubAccountBox
+                  key={`pl-sub-${subAccount.name}-${index}`}
+                  name={subAccount.name}
+                  position={[baseX + xOffset, yOffset, baseZ]}
+                  scale={1.0}
+                  onSelect={() => handleTreeClick(subAccount.name, false)}
+                  isSelected={selectedAccount === subAccount.name}
+                  clickCount={clickCounts[subAccount.name] || 0}
+                  balance={accountBalances[subAccount.name] || 0}
+                />
+              );
+            })}
+            </group>
+          );
+        })()}
+
+        {/* Decorative background trees */}
+        <DecorativeTree position={[15, 0, 12.5]} scale={1.2} treeType="round" />
+        <DecorativeTree position={[3, 0, 12.5]} scale={0.9} treeType="pine" />
+        
+        {/* Bushes */}
+        <Bush position={[13.5, 0, 8]} scale={0.8} />
+        <Bush position={[7.5, 0, 11]} scale={0.7} />
+
+        {/* Flower beds */}
+        <FlowerBed position={[12, 0, 8]} width={2.25} depth={0.6} />
+        <FlowerBed position={[6, 0, 9.5]} width={1.8} depth={0.6} />
+
+        {/* Railings - separate boundary for equity */}
+        <Railing position={[16.5, 0, 8]} width={15} orientation="vertical" />
+        <Railing position={[9, 0, 12.5]} width={15} orientation="horizontal" />
+        <Railing position={[9, 0, 5]} width={15} orientation="horizontal" />
+        
+        {/* Advanced Decorative Elements */}
+        <Bench position={[13.5, 0, 11]} rotation={Math.PI/4} />
+        <LampPost position={[10.5, 0, 5]} />
+        <Topiary position={[7.5, 0, 8]} shape="cone" />
+        <RockCluster position={[4.5, 0, 9.5]} count={4} />
+        <SteppingStones startPos={[12, 8]} endPos={[3, 8]} count={6} />
       </group>
 
       {/* CENTRAL DECORATIVE AREA */}
       <group>
         {/* Central fountain */}
-        <Fountain position={[0, 0, 0]} />
+        <Fountain position={[0, 0, -7]} />
         
 
         
         {/* Benches */}
-        <Bench position={[-3, 0, 6]} rotation={Math.PI} />
-        <Bench position={[3, 0, 6]} rotation={Math.PI} />
-        <Bench position={[-3, 0, -6]} rotation={0} />
-        <Bench position={[3, 0, -6]} rotation={0} />
+        <Bench position={[-4.5, 0, 2]} rotation={Math.PI} />
+        <Bench position={[4.5, 0, 2]} rotation={Math.PI} />
+        <Bench position={[-4.5, 0, -16]} rotation={0} />
+        <Bench position={[4.5, 0, -16]} rotation={0} />
         
         {/* Lamp posts */}
-        <LampPost position={[-10, 0, 6]} />
-        <LampPost position={[10, 0, 6]} />
-        <LampPost position={[-10, 0, -6]} />
-        <LampPost position={[10, 0, -6]} />
-        <LampPost position={[0, 0, 8]} />
-        <LampPost position={[0, 0, -8]} />
+        <LampPost position={[-15, 0, 2]} />
+        <LampPost position={[15, 0, 2]} />
+        <LampPost position={[-15, 0, -16]} />
+        <LampPost position={[15, 0, -16]} />
+        <LampPost position={[0, 0, 5]} />
+        <LampPost position={[0, 0, -19]} />
         
         {/* Topiary decorations */}
-        <Topiary position={[-1.5, 0, 1.5]} shape="sphere" />
-        <Topiary position={[1.5, 0, 1.5]} shape="cone" />
-        <Topiary position={[-1.5, 0, -1.5]} shape="cone" />
-        <Topiary position={[1.5, 0, -1.5]} shape="sphere" />
+        <Topiary position={[-2.25, 0, -4.75]} shape="sphere" />
+        <Topiary position={[2.25, 0, -4.75]} shape="cone" />
+        <Topiary position={[-2.25, 0, -9.25]} shape="cone" />
+        <Topiary position={[2.25, 0, -9.25]} shape="sphere" />
         
         {/* Stepping stones */}
-        <SteppingStones startPos={[-10, -8]} endPos={[-4, -4]} count={6} />
-        <SteppingStones startPos={[10, -8]} endPos={[4, -4]} count={6} />
-        <SteppingStones startPos={[-10, 8]} endPos={[-4, 4]} count={6} />
-        <SteppingStones startPos={[10, 8]} endPos={[4, 4]} count={6} />
+        <SteppingStones startPos={[-15, -19]} endPos={[-6, -13]} count={6} />
+        <SteppingStones startPos={[15, -19]} endPos={[6, -13]} count={6} />
+        <SteppingStones startPos={[-15, 5]} endPos={[-6, -1]} count={6} />
+        <SteppingStones startPos={[15, 5]} endPos={[6, -1]} count={6} />
         
         {/* Rock clusters */}
-        <RockCluster position={[-8, 0, 5]} count={4} />
-        <RockCluster position={[8, 0, -5]} count={3} />
-        <RockCluster position={[-5, 0, -5]} count={3} />
-        <RockCluster position={[5, 0, 5]} count={4} />
+        <RockCluster position={[-12, 0, 0.5]} count={4} />
+        <RockCluster position={[12, 0, -14.5]} count={3} />
+        <RockCluster position={[-7.5, 0, -14.5]} count={3} />
+        <RockCluster position={[7.5, 0, 0.5]} count={4} />
         
         {/* Grass patches */}
-        <GrassPatch position={[-11, 0, 3]} count={15} />
-        <GrassPatch position={[-11, 0, -3]} count={15} />
-        <GrassPatch position={[11, 0, 3]} count={15} />
-        <GrassPatch position={[11, 0, -3]} count={15} />
-        <GrassPatch position={[-1, 0, 7]} count={20} />
-        <GrassPatch position={[1, 0, 7]} count={20} />
-        <GrassPatch position={[-1, 0, -7]} count={20} />
-        <GrassPatch position={[1, 0, -7]} count={20} />
+        <GrassPatch position={[-16.5, 0, -2.5]} count={15} />
+        <GrassPatch position={[-16.5, 0, -11.5]} count={15} />
+        <GrassPatch position={[16.5, 0, -2.5]} count={15} />
+        <GrassPatch position={[16.5, 0, -11.5]} count={15} />
+        <GrassPatch position={[-1.5, 0, 3.5]} count={20} />
+        <GrassPatch position={[1.5, 0, 3.5]} count={20} />
+        <GrassPatch position={[-1.5, 0, -17.5]} count={20} />
+        <GrassPatch position={[1.5, 0, -17.5]} count={20} />
       </group>
 
       <OrbitControls 
@@ -4364,16 +4821,20 @@ function AccountEntrySidePanel({ account, isAsset, transactionType, clickCount, 
       position: 'absolute',
       top: '80px',
       right: '20px',
-      background: 'white',
-      padding: '25px',
-      borderRadius: '15px',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-      minWidth: '400px',
+      background: 'rgba(15, 23, 42, 0.85)',
+      backdropFilter: 'blur(24px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+      padding: '30px',
+      borderRadius: '24px',
+      boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+      minWidth: '420px',
       zIndex: 1000,
-      border: '2px solid #e0e0e0'
+      border: '2px solid rgba(139, 92, 246, 0.3)',
+      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+      animation: 'slideInRight 0.5s ease-out'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h3 style={{ margin: 0, color: '#333', fontSize: '24px', fontWeight: 'bold' }}>
+        <h3 style={{ margin: 0, color: '#ffffff', fontSize: '24px', fontWeight: 'bold' }}>
           💰 {account}
         </h3>
         <button
@@ -4396,15 +4857,15 @@ function AccountEntrySidePanel({ account, isAsset, transactionType, clickCount, 
         </button>
       </div>
 
-      <div style={{ marginBottom: '15px', padding: '12px', background: '#f5f5f5', borderRadius: '8px' }}>
-        <div style={{ fontSize: '14px', color: '#666', marginBottom: '5px' }}>Current Balance:</div>
-        <div style={{ fontSize: '24px', fontWeight: 'bold', color: accountBalance >= 0 ? '#4caf50' : '#f44336' }}>
+      <div style={{ marginBottom: '15px', padding: '12px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '8px' }}>
+        <div style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '5px' }}>Current Balance:</div>
+        <div style={{ fontSize: '24px', fontWeight: 'bold', color: accountBalance >= 0 ? '#4ade80' : '#f87171' }}>
           ${accountBalance.toFixed(2)}
         </div>
       </div>
 
       <div style={{ marginBottom: '15px' }}>
-        <h4 style={{ color: '#555', marginBottom: '10px' }}>Transaction Type:</h4>
+        <h4 style={{ color: 'rgba(255, 255, 255, 0.9)', marginBottom: '10px' }}>Transaction Type:</h4>
         <div style={{
           padding: '12px',
           background: clickCount === 2 ? '#e8f5e9' : clickCount === 1 ? '#ffebee' : '#f5f5f5',
@@ -4421,7 +4882,7 @@ function AccountEntrySidePanel({ account, isAsset, transactionType, clickCount, 
           </div>
           <div style={{ 
             fontSize: '12px', 
-            color: '#666', 
+            color: 'rgba(255, 255, 255, 0.6)', 
             textAlign: 'center', 
             marginTop: '5px' 
           }}>
@@ -4431,7 +4892,7 @@ function AccountEntrySidePanel({ account, isAsset, transactionType, clickCount, 
       </div>
 
       <div style={{ marginBottom: '15px' }}>
-        <h4 style={{ color: '#555', marginBottom: '10px' }}>Amount:</h4>
+        <h4 style={{ color: 'rgba(255, 255, 255, 0.9)', marginBottom: '10px' }}>Amount:</h4>
         <input
           type="number"
           placeholder="Enter amount"
@@ -4453,18 +4914,46 @@ function AccountEntrySidePanel({ account, isAsset, transactionType, clickCount, 
           disabled={clickCount === 3 || !amount || isNaN(amount) || parseFloat(amount) <= 0}
           style={{
             flex: 1,
-            padding: '12px',
-            background: '#2196F3',
+            padding: '16px 24px',
+            background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)',
             color: 'white',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: '16px',
             cursor: clickCount === 3 || !amount || isNaN(amount) || parseFloat(amount) <= 0 ? 'not-allowed' : 'pointer',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            opacity: clickCount === 3 || !amount || isNaN(amount) || parseFloat(amount) <= 0 ? 0.5 : 1
+            fontSize: '17px',
+            fontWeight: '700',
+            opacity: clickCount === 3 || !amount || isNaN(amount) || parseFloat(amount) <= 0 ? 0.4 : 1,
+            boxShadow: '0 8px 24px rgba(139, 92, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transform: 'translateY(0)',
+            position: 'relative',
+            overflow: 'hidden',
+            letterSpacing: '0.5px',
+            textTransform: 'uppercase'
+          }}
+          onMouseOver={(e) => {
+            if (clickCount !== 3 && amount && !isNaN(amount) && parseFloat(amount) > 0) {
+              e.target.style.transform = 'translateY(-3px) scale(1.02)';
+              e.target.style.boxShadow = '0 12px 32px rgba(139, 92, 246, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)';
+            }
+          }}
+          onMouseOut={(e) => {
+            e.target.style.transform = 'translateY(0) scale(1)';
+            e.target.style.boxShadow = '0 8px 24px rgba(139, 92, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)';
           }}
         >
-          {clickCount === 3 ? '⚪ No Entry' : '✅ Save'}
+          <div style={{
+            position: 'absolute',
+            top: '-50%',
+            left: '-50%',
+            width: '200%',
+            height: '200%',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)',
+            animation: 'buttonPulse 3s ease-in-out infinite'
+          }} />
+          <span style={{ position: 'relative', zIndex: 1 }}>
+            {clickCount === 3 ? '⚪ No Entry' : '✨ Save Transaction'}
+          </span>
         </button>
         <button
           onClick={onClose}
@@ -4780,6 +5269,29 @@ function AccountDetailsModal({ isVisible, type, accounts, onClose }) {
   if (!isVisible) return null;
 
   const totalAmount = accounts.reduce((sum, account) => sum + account.balance, 0);
+  
+  const themeColors = {
+    assets: { 
+      primary: '#10b981', 
+      secondary: '#059669',
+      glow: 'rgba(16, 185, 129, 0.3)',
+      bg: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)'
+    },
+    equity: { 
+      primary: '#3b82f6', 
+      secondary: '#2563eb',
+      glow: 'rgba(59, 130, 246, 0.3)',
+      bg: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)'
+    },
+    liabilities: { 
+      primary: '#f59e0b', 
+      secondary: '#d97706',
+      glow: 'rgba(245, 158, 11, 0.3)',
+      bg: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)'
+    }
+  };
+  
+  const colors = themeColors[type] || themeColors.assets;
 
   return (
     <div style={{
@@ -4788,96 +5300,226 @@ function AccountDetailsModal({ isVisible, type, accounts, onClose }) {
       left: 0,
       width: '100vw',
       height: '100vh',
-      background: 'rgba(0, 0, 0, 0.7)',
+      background: 'rgba(0, 0, 0, 0.85)',
+      backdropFilter: 'blur(12px)',
       zIndex: 2000,
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      animation: 'fadeIn 0.3s ease-out'
     }}>
       <div style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-        padding: '30px',
-        borderRadius: '20px',
-        maxWidth: '600px',
+        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.95) 100%)',
+        padding: '40px',
+        borderRadius: '32px',
+        maxWidth: '700px',
         width: '90%',
-        maxHeight: '80vh',
+        maxHeight: '85vh',
         overflowY: 'auto',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-        border: `3px solid ${type === 'assets' ? '#4a7c3c' : '#cd853f'}`,
-        animation: 'fadeInUp 0.6s ease-out'
+        boxShadow: `0 30px 90px ${colors.glow}, inset 0 0 0 2px ${colors.primary}`,
+        border: `3px solid ${colors.primary}`,
+        animation: 'modalSlideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 style={{ margin: 0, color: '#333' }}>
-            {type === 'assets' ? '💰' : '📋'} {type === 'assets' ? 'ASSET ACCOUNTS' : 'LIABILITY ACCOUNTS'}
+        {/* Animated background effect */}
+        <div style={{
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          background: `radial-gradient(circle, ${colors.glow} 0%, transparent 70%)`,
+          animation: 'pulse 4s ease-in-out infinite',
+          pointerEvents: 'none'
+        }} />
+        
+        {/* Header */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: '30px',
+          position: 'relative',
+          zIndex: 1
+        }}>
+          <h2 style={{ 
+            margin: 0, 
+            color: colors.primary,
+            fontSize: '32px',
+            fontWeight: '900',
+            textShadow: `0 0 20px ${colors.glow}, 0 0 40px ${colors.glow}`,
+            letterSpacing: '1px',
+            textTransform: 'uppercase'
+          }}>
+            {type === 'assets' ? '💰 ASSETS' : type === 'equity' ? '🏛️ EQUITY' : '📋 LIABILITIES'}
           </h2>
+          
           <button
             onClick={onClose}
             style={{
-              background: '#f44336',
+              background: `linear-gradient(135deg, #ef4444 0%, #dc2626 100%)`,
               color: 'white',
               border: 'none',
               borderRadius: '50%',
-              width: '40px',
-              height: '40px',
+              width: '48px',
+              height: '48px',
               cursor: 'pointer',
-              fontSize: '18px',
+              fontSize: '24px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              boxShadow: '0 8px 24px rgba(239, 68, 68, 0.4)',
+              transition: 'all 0.3s ease',
+              fontWeight: '300'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.transform = 'scale(1.1) rotate(90deg)';
+              e.target.style.boxShadow = '0 12px 32px rgba(239, 68, 68, 0.6)';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.transform = 'scale(1) rotate(0deg)';
+              e.target.style.boxShadow = '0 8px 24px rgba(239, 68, 68, 0.4)';
             }}
           >
             ×
           </button>
         </div>
 
-        {/* Total Summary */}
+        {/* Total Summary Card */}
         <div style={{
-          padding: '20px',
-          background: type === 'assets' ? '#e8f5e9' : '#fff3e0',
-          borderRadius: '15px',
-          marginBottom: '20px',
-          border: `3px solid ${type === 'assets' ? '#4a7c3c' : '#cd853f'}`,
-          textAlign: 'center'
+          padding: '30px',
+          background: colors.bg,
+          borderRadius: '24px',
+          marginBottom: '30px',
+          border: `3px solid ${colors.primary}`,
+          textAlign: 'center',
+          boxShadow: `0 12px 40px ${colors.glow}, inset 0 1px 0 rgba(255,255,255,0.1)`,
+          position: 'relative',
+          overflow: 'hidden',
+          zIndex: 1
         }}>
-          <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>
-            Total {type === 'assets' ? 'Assets' : 'Liabilities'}
-          </h3>
           <div style={{
-            fontSize: '32px',
-            fontWeight: 'bold',
-            color: type === 'assets' ? '#4caf50' : '#f44336'
+            position: 'absolute',
+            top: 0,
+            left: '-100%',
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
+            animation: 'shimmer 3s infinite'
+          }} />
+          
+          <h3 style={{ 
+            margin: '0 0 15px 0', 
+            color: '#94a3b8',
+            fontSize: '16px',
+            fontWeight: '600',
+            letterSpacing: '2px',
+            textTransform: 'uppercase'
+          }}>
+            Total {type === 'assets' ? 'Assets' : type === 'equity' ? 'Equity' : 'Liabilities'}
+          </h3>
+          
+          <div style={{
+            fontSize: '48px',
+            fontWeight: '900',
+            color: colors.primary,
+            textShadow: `0 0 30px ${colors.glow}`,
+            letterSpacing: '-2px'
           }}>
             ${totalAmount.toFixed(2)}
           </div>
         </div>
 
-        {/* Individual Accounts */}
-        <div>
-          <h3 style={{ margin: '0 0 15px 0', color: '#333' }}>Account Breakdown</h3>
-          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+        {/* Account List */}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <h3 style={{ 
+            margin: '0 0 20px 0', 
+            color: '#e2e8f0',
+            fontSize: '20px',
+            fontWeight: '700',
+            letterSpacing: '1px'
+          }}>
+            ACCOUNT BREAKDOWN
+          </h3>
+          
+          <div style={{ 
+            maxHeight: '450px', 
+            overflowY: 'auto',
+            paddingRight: '10px'
+          }}>
             {accounts.map((account, index) => (
-              <div key={index} style={{
-                padding: '15px',
-                marginBottom: '10px',
-                background: account.balance >= 0 ? '#e8f5e9' : '#ffebee',
-                borderRadius: '10px',
-                border: `2px solid ${account.balance >= 0 ? '#4caf50' : '#f44336'}`,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
+              <div 
+                key={index} 
+                style={{
+                  padding: '20px',
+                  marginBottom: '12px',
+                  background: account.balance >= 0 
+                    ? colors.bg
+                    : 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+                  borderRadius: '16px',
+                  border: `2px solid ${account.balance >= 0 ? colors.primary : '#ef4444'}`,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  boxShadow: account.balance >= 0 
+                    ? `0 4px 16px ${colors.glow}`
+                    : '0 4px 16px rgba(239, 68, 68, 0.3)',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateX(8px)';
+                  e.currentTarget.style.boxShadow = account.balance >= 0 
+                    ? `0 8px 24px ${colors.glow}`
+                    : '0 8px 24px rgba(239, 68, 68, 0.5)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateX(0)';
+                  e.currentTarget.style.boxShadow = account.balance >= 0 
+                    ? `0 4px 16px ${colors.glow}`
+                    : '0 4px 16px rgba(239, 68, 68, 0.3)';
+                }}
+              >
+                {/* Glow effect on hover */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '4px',
+                  height: '100%',
+                  background: account.balance >= 0 ? colors.primary : '#ef4444',
+                  boxShadow: `0 0 12px ${account.balance >= 0 ? colors.primary : '#ef4444'}`
+                }} />
+                
                 <div>
-                  <div style={{ fontWeight: 'bold', color: '#333', fontSize: '16px' }}>
+                  <div style={{ 
+                    fontWeight: '700', 
+                    color: '#e2e8f0', 
+                    fontSize: '18px',
+                    marginBottom: '4px'
+                  }}>
                     {account.name}
                   </div>
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                    {type === 'assets' ? 'Asset Account' : 'Liability Account'}
+                  <div style={{ 
+                    fontSize: '12px', 
+                    color: '#64748b',
+                    fontWeight: '600',
+                    letterSpacing: '1px',
+                    textTransform: 'uppercase'
+                  }}>
+                    {type === 'assets' ? '🔹 Asset' : type === 'equity' ? '🔹 Equity' : '🔹 Liability'}
                   </div>
                 </div>
+                
                 <div style={{
-                  fontSize: '20px',
-                  fontWeight: 'bold',
-                  color: account.balance >= 0 ? '#4caf50' : '#f44336'
+                  fontSize: '24px',
+                  fontWeight: '900',
+                  color: account.balance >= 0 ? colors.primary : '#ef4444',
+                  textShadow: `0 0 12px ${account.balance >= 0 ? colors.glow : 'rgba(239, 68, 68, 0.5)'}`,
+                  letterSpacing: '-1px'
                 }}>
                   ${account.balance.toFixed(2)}
                 </div>
@@ -4891,7 +5533,7 @@ function AccountDetailsModal({ isVisible, type, accounts, onClose }) {
 }
 
 // Account Balance Dashboard
-function BalanceDashboard({ accountBalances, journalEntries, onAssetClick, onLiabilityClick }) {
+function BalanceDashboard({ accountBalances, journalEntries, onAssetClick, onLiabilityClick, onEquityClick }) {
   const [expanded, setExpanded] = useState(false);
   
   const totalAssets = Object.entries(accountBalances)
@@ -4902,17 +5544,23 @@ function BalanceDashboard({ accountBalances, journalEntries, onAssetClick, onLia
     .filter(([name]) => liabilityAccounts.find(acc => acc.name === name))
     .reduce((sum, [, balance]) => sum + balance, 0);
     
+  const totalEquity = Object.entries(accountBalances)
+    .filter(([name]) => equityAccounts.find(acc => acc.name === name))
+    .reduce((sum, [, balance]) => sum + balance, 0);
+    
   // Animated values for smooth progress bar transitions
   const [animatedAssets, setAnimatedAssets] = useState(0);
   const [animatedLiabilities, setAnimatedLiabilities] = useState(0);
+  const [animatedEquity, setAnimatedEquity] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimatedAssets(totalAssets);
       setAnimatedLiabilities(totalLiabilities);
+      setAnimatedEquity(totalEquity);
     }, 100);
     return () => clearTimeout(timer);
-  }, [totalAssets, totalLiabilities]);
+  }, [totalAssets, totalLiabilities, totalEquity]);
 
   const netWorth = totalAssets - totalLiabilities;
 
@@ -4944,49 +5592,93 @@ function BalanceDashboard({ accountBalances, journalEntries, onAssetClick, onLia
             style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
-              marginBottom: '8px',
+              marginBottom: '12px',
               cursor: 'pointer',
-              padding: '12px',
-              borderRadius: '12px',
-              transition: 'all 0.3s ease',
-              background: 'linear-gradient(135deg, #e8f5e9 0%, rgba(76, 175, 80, 0.1) 100%)',
-              border: '2px solid #4caf50',
-              boxShadow: '0 2px 8px rgba(76, 175, 80, 0.2)'
+              padding: '20px 24px',
+              borderRadius: '20px',
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.05) 100%)',
+              border: '2px solid rgba(16, 185, 129, 0.3)',
+              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(12px)',
+              position: 'relative',
+              overflow: 'hidden'
             }}
             onClick={onAssetClick}
           >
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: '-100%',
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
+              transition: 'left 0.5s ease'
+            }} className="shine-effect" />
+            
             <span style={{ 
-              color: '#2e7d32', 
-              fontWeight: 'bold',
-              textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
-              fontSize: '16px'
+              color: '#10b981', 
+              fontWeight: '700',
+              fontSize: '16px',
+              letterSpacing: '0.5px',
+              textShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
+              zIndex: 1
             }}>💰 Total Assets:</span>
+            
             <span style={{ 
-              color: totalAssets >= 0 ? '#1b5e20' : '#d32f2f', 
-              fontWeight: 'bold',
-              textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
-              fontSize: '16px'
+              color: totalAssets >= 0 ? '#10b981' : '#ef4444', 
+              fontWeight: '800',
+              fontSize: '18px',
+              letterSpacing: '-0.5px',
+              textShadow: '0 2px 8px rgba(16, 185, 129, 0.5)',
+              zIndex: 1
             }}>${totalAssets.toFixed(2)}</span>
           </div>
           
           {/* Progress bar for assets */}
           <div style={{ 
             width: '100%', 
-            height: '8px', 
-            backgroundColor: '#e0e0e0', 
-            borderRadius: '4px',
-            marginBottom: '12px',
+            height: '12px', 
+            backgroundColor: 'rgba(30, 41, 59, 0.6)', 
+            borderRadius: '12px',
+            marginBottom: '16px',
             overflow: 'hidden',
-            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)'
+            boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            position: 'relative'
           }}>
             <div style={{
               width: `${Math.min(100, (animatedAssets / Math.max(animatedAssets + Math.abs(animatedLiabilities), 1)) * 100)}%`,
               height: '100%',
-              background: 'linear-gradient(90deg, #4caf50 0%, #66bb6a 100%)',
-              borderRadius: '4px',
-              transition: 'width 0.8s ease',
-              boxShadow: '0 1px 3px rgba(76, 175, 80, 0.3)'
-            }} />
+              background: 'linear-gradient(90deg, #10b981 0%, #059669 50%, #047857 100%)',
+              borderRadius: '12px',
+              transition: 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 0 20px rgba(16, 185, 129, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              {/* Animated shine effect */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+                animation: 'shimmer 2.5s infinite'
+              }} />
+              
+              {/* Pulsing glow */}
+              <div style={{
+                position: 'absolute',
+                top: '-50%',
+                left: '0',
+                right: '0',
+                height: '200%',
+                background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.3) 0%, transparent 70%)',
+                animation: 'pulse 2s ease-in-out infinite'
+              }} />
+            </div>
           </div>
           <div 
             className="balance-item liability-item"
@@ -5035,6 +5727,55 @@ function BalanceDashboard({ accountBalances, journalEntries, onAssetClick, onLia
               borderRadius: '4px',
               transition: 'width 0.8s ease',
               boxShadow: '0 1px 3px rgba(244, 67, 54, 0.3)'
+            }} />
+          </div>
+          <div 
+            className="balance-item equity-item"
+            style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              marginBottom: '8px',
+              cursor: 'pointer',
+              padding: '12px',
+              borderRadius: '12px',
+              transition: 'all 0.3s ease',
+              background: 'linear-gradient(135deg, #e3f2fd 0%, rgba(33, 150, 243, 0.1) 100%)',
+              border: '2px solid #2196f3',
+              boxShadow: '0 2px 8px rgba(33, 150, 243, 0.2)'
+            }}
+            onClick={onEquityClick}
+          >
+            <span style={{ 
+              color: '#1565c0', 
+              fontWeight: 'bold',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+              fontSize: '16px'
+            }}>🏛️ Total Equity:</span>
+            <span style={{ 
+              color: totalEquity >= 0 ? '#1565c0' : '#d32f2f', 
+              fontWeight: 'bold',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+              fontSize: '16px'
+            }}>${totalEquity.toFixed(2)}</span>
+          </div>
+          
+          {/* Progress bar for equity */}
+          <div style={{ 
+            width: '100%', 
+            height: '8px', 
+            backgroundColor: '#e0e0e0', 
+            borderRadius: '4px',
+            marginBottom: '12px',
+            overflow: 'hidden',
+            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{
+              width: `${Math.min(100, (Math.abs(animatedEquity) / Math.max(animatedAssets + Math.abs(animatedEquity), 1)) * 100)}%`,
+              height: '100%',
+              background: 'linear-gradient(90deg, #2196f3 0%, #42a5f5 100%)',
+              borderRadius: '4px',
+              transition: 'width 0.8s ease',
+              boxShadow: '0 1px 3px rgba(33, 150, 243, 0.3)'
             }} />
           </div>
           <div style={{ 
@@ -5503,7 +6244,8 @@ function CameraControls({ onCameraChange }) {
     { name: '🔍 Close Up', position: [0, 5, 8], target: [0, 0, 0] },
     { name: '🌅 Wide View', position: [0, 15, 30], target: [0, 0, 0] },
     { name: '📊 Assets Focus', position: [-8, 8, 12], target: [-4, 0, 0] },
-    { name: '📋 Liabilities Focus', position: [8, 8, 12], target: [4, 0, 0] }
+    { name: '📋 Liabilities Focus', position: [8, 8, 5], target: [4, 0, 0] },
+    { name: '🏛️ Equity Focus', position: [8, 8, 16], target: [6, 0, 10] }
   ];
 
   return (
@@ -5570,6 +6312,7 @@ export default function App() {
   const rainIntensity = 1;
   const [accountEntryPanel, setAccountEntryPanel] = useState({ visible: false, account: '', isAsset: false, transactionType: 'debit', clickCount: 0 });
   const [transactionsCollapsed, setTransactionsCollapsed] = useState(true);
+  const [showPLSubAccounts, setShowPLSubAccounts] = useState(false);
   const [accountBalances, setAccountBalances] = useState({
     // Liability accounts (left side)
     'Credit Card Debt': 0,
@@ -5586,6 +6329,19 @@ export default function App() {
     'Equipment': 0,
     'Real Estate': 0,
     'Investments': 0,
+    // Equity accounts
+    'P&L': 0,
+    'Prefer': 0,
+    'Capital': 0,
+    'Retained Earnings': 0,
+    'Common Stock': 0,
+    // P&L Sub-accounts
+    'Revenue': 0,
+    'Expenses': 0,
+    'Cost of Goods': 0,
+    'Operating Income': 0,
+    'Net Income': 0,
+    'Other Income': 0,
   });
 
   const handleJournalClick = () => {
@@ -5744,6 +6500,11 @@ export default function App() {
     balance: accountBalances[acc.name] || 0
   }));
 
+  const equityDetails = equityAccounts.map(acc => ({
+    name: acc.name,
+    balance: accountBalances[acc.name] || 0
+  }));
+
   const handleCameraChange = (position, target) => {
     setCameraPosition(position);
     setCameraTarget(target);
@@ -5784,10 +6545,90 @@ export default function App() {
             }
           }
           
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
+          }
+          
+          @keyframes modalSlideUp {
+            from {
+              opacity: 0;
+              transform: translateY(100px) scale(0.9);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0) scale(1);
+            }
+          }
+          
           @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
+          }
+          
+          @keyframes buttonPulse {
+            0%, 100% {
+              opacity: 0.3;
+              transform: scale(1);
+            }
+            50% {
+              opacity: 0.6;
+              transform: scale(1.5);
+            }
+          }
+          
+          @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+          }
+          
+          @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+          }
+          
+          @keyframes gentleRotate {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(2deg); }
+          }
+          
+          @keyframes slideInRight {
+            from {
+              opacity: 0;
+              transform: translateX(100px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+          
+          @keyframes neonGlow {
+            0%, 100% {
+              text-shadow: 0 0 10px rgba(139, 92, 246, 0.8),
+                           0 0 20px rgba(139, 92, 246, 0.6),
+                           0 0 30px rgba(139, 92, 246, 0.4);
+            }
+            50% {
+              text-shadow: 0 0 20px rgba(139, 92, 246, 1),
+                           0 0 30px rgba(139, 92, 246, 0.8),
+                           0 0 40px rgba(139, 92, 246, 0.6);
+            }
+          }
+          
+          /* Cyberpunk grid background */
+          @keyframes gridMove {
+            0% {
+              background-position: 0 0;
+            }
+            100% {
+              background-position: 50px 50px;
+            }
           }
           
           .ui-panel {
@@ -5827,6 +6668,38 @@ export default function App() {
           .liability-item:hover {
             background: #ffcdd2 !important;
           }
+
+          .equity-item:hover {
+            background: #bbdefb !important;
+          }
+
+          .shine-effect {
+            pointer-events: none;
+          }
+
+          .balance-item:hover .shine-effect {
+            left: 100%;
+          }
+
+          /* Custom scrollbar for modals */
+          div::-webkit-scrollbar {
+            width: 8px;
+          }
+
+          div::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+          }
+
+          div::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+          }
+
+          div::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+          }
         `}
       </style>
       <Canvas 
@@ -5845,39 +6718,68 @@ export default function App() {
           cameraPosition={cameraPosition}
           cameraTarget={cameraTarget}
           rainIntensity={rainIntensity}
+          showPLSubAccounts={showPLSubAccounts}
+          setShowPLSubAccounts={setShowPLSubAccounts}
         />
       </Canvas>
       
-      {/* Title/Header */}
-      <div style={{
-        position: 'absolute',
-        top: '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        color: '#333',
-        fontSize: '32px',
-        fontWeight: 'bold',
-        zIndex: 999,
-        textAlign: 'center',
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-        padding: '16px 40px',
-        borderRadius: '20px',
-        border: '3px solid #e0e0e0',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-        backdropFilter: 'blur(10px)',
-        animation: 'titleGlow 3s ease-in-out infinite alternate'
-      }}>
-        🌳 Accounting Garden 🌳
+      {/* Title/Header - Hidden when P&L sub-accounts are open */}
+      {!showPLSubAccounts && (
         <div style={{
-          fontSize: '14px',
-          fontWeight: 'normal',
-          color: '#666',
-          marginTop: '4px',
-          fontStyle: 'italic'
+          position: 'absolute',
+          top: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          color: '#fff',
+          fontSize: '38px',
+          fontWeight: '900',
+          zIndex: 999,
+          textAlign: 'center',
+          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%)',
+          padding: '20px 50px',
+          borderRadius: '24px',
+          border: '2px solid rgba(139, 92, 246, 0.5)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(20px)',
+          animation: 'neonGlow 3s ease-in-out infinite',
+          overflow: 'hidden'
         }}>
-          Interactive 3D Financial Management
+          <div style={{
+            position: 'absolute',
+            top: '-50%',
+            left: '-50%',
+            width: '200%',
+            height: '200%',
+            background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%)',
+            animation: 'pulse 4s ease-in-out infinite'
+          }} />
+          
+          <span style={{
+            background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #8b5cf6 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            position: 'relative',
+            zIndex: 1
+          }}>
+            🌳 Accounting Garden 🌳
+          </span>
+          
+          <div style={{
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#94a3b8',
+            marginTop: '8px',
+            fontStyle: 'italic',
+            letterSpacing: '2px',
+            textTransform: 'uppercase',
+            position: 'relative',
+            zIndex: 1
+          }}>
+            ⚡ Premium Financial Management System ⚡
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Legend */}
       <div className="ui-panel" style={{
@@ -5983,6 +6885,7 @@ export default function App() {
         journalEntries={journalEntries}
         onAssetClick={() => setShowDetails({ visible: true, type: 'assets' })}
         onLiabilityClick={() => setShowDetails({ visible: true, type: 'liabilities' })}
+        onEquityClick={() => setShowDetails({ visible: true, type: 'equity' })}
       />
       <ExportImportPanel 
         journalEntries={journalEntries} 
@@ -5994,7 +6897,7 @@ export default function App() {
       <AccountDetailsModal
         isVisible={showDetails.visible}
         type={showDetails.type}
-        accounts={showDetails.type === 'assets' ? assetDetails : liabilityDetails}
+        accounts={showDetails.type === 'assets' ? assetDetails : showDetails.type === 'equity' ? equityDetails : liabilityDetails}
         onClose={handleCloseDetails}
       />
       
